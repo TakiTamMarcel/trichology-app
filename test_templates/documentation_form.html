@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ 'Edycja Karty Pacjenta' if is_edit else 'Nowa Karta Pacjenta' }}</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/documentation_form.css') }}">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="fas fa-user-md fa-2x" style="color: white;"></i>
+            <span>Trichology</span>
+        </div>
+        
+        <nav>
+            <a href="/" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/documentation_form" class="nav-item active">
+                <i class="fas fa-user-plus"></i>
+                <span>Nowy Pacjent</span>
+            </a>
+            <a href="/polecane-produkty" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>Produkty</span>
+            </a>
+            <a href="/polecani-fryzjerzy" class="nav-item">
+                <i class="fas fa-cut"></i>
+                <span>Fryzjerzy</span>
+            </a>
+            <a href="/polecane-kliniki" class="nav-item">
+                <i class="fas fa-hospital"></i>
+                <span>Kliniki</span>
+            </a>
+            <a href="/settings" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Ustawienia</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <h1>{{ 'Edycja Karty Pacjenta' if is_edit else 'Nowa Karta Pacjenta' }}</h1>
+                <p>Wypełnij dokumentację pacjenta</p>
+            </div>
+            <div class="user-profile">
+                <i class="fas fa-user-circle fa-2x" style="color: var(--primary-color);"></i>
+                <span>Dr. Anna Kowalska</span>
+                <span class="role">Trycholog</span>
+            </div>
+        </div>
+
+        <form id="patientForm" method="POST" action="/api/save-patient">
+            <div class="form-container">
+                <!-- Lewa kolumna - Dane osobowe i Historia chorobowa -->
+                <div class="form-column">
+                    <div class="form-column-header">
+                        <i class="fas fa-user"></i>
+                        <h2>Dane osobowe</h2>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="first_name" class="required">
+                            <i class="fas fa-user"></i>
+                            Imię
+                        </label>
+                        <input type="text" id="first_name" name="first_name" required value="{{ patient.first_name if patient else '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="last_name" class="required">
+                            <i class="fas fa-user"></i>
+                            Nazwisko
+                        </label>
+                        <input type="text" id="last_name" name="last_name" required value="{{ patient.last_name if patient else '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pesel" class="required">
+                            <i class="fas fa-id-card"></i>
+                            PESEL
+                        </label>
+                        <input type="text" id="pesel" name="pesel" required value="{{ patient.pesel if patient else '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="birth_date" class="required">
+                            <i class="fas fa-calendar"></i>
+                            Data urodzenia
+                        </label>
+                        <input type="date" id="birth_date" name="birth_date" required value="{{ patient.birth_date if patient else '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender" class="required">
+                            <i class="fas fa-venus-mars"></i>
+                            Płeć
+                        </label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="gender_female" name="gender" value="female" required {% if patient and patient.gender == 'female' %}checked{% endif %}>
+                                <label for="gender_female"><i class="fas fa-venus"></i> Kobieta</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="gender_male" name="gender" value="male" required {% if patient and patient.gender == 'male' %}checked{% endif %}>
+                                <label for="gender_male"><i class="fas fa-mars"></i> Mężczyzna</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">
+                            <i class="fas fa-home"></i>
+                            Adres zamieszkania
+                        </label>
+                        <textarea id="address" name="address" class="form-textarea" placeholder="Ulica, numer, kod pocztowy, miasto">{{ patient.address if patient else '' }}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="occupation">
+                            <i class="fas fa-briefcase"></i>
+                            Zawód
+                        </label>
+                        <input type="text" id="occupation" name="occupation" value="{{ patient.occupation if patient else '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </label>
+                        <input type="email" id="email" name="email" value="{{ patient.email if patient else '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">
+                            <i class="fas fa-phone"></i>
+                            Telefon
+                        </label>
+                        <input type="tel" id="phone" name="phone" value="{{ patient.phone if patient else '' }}">
+                    </div>
+
+                    <div class="form-column-header">
+                        <i class="fas fa-history"></i>
+                        <h2>Historia chorobowa</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-disease"></i>
+                            Choroby przewlekłe
+                        </label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="diabetes" name="chronic_diseases" value="diabetes" {% if patient and 'diabetes' in patient.chronic_diseases %}checked{% endif %}>
+                                <label for="diabetes"><i class="fas fa-syringe"></i> Cukrzyca</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="thyroid" name="chronic_diseases" value="thyroid" {% if patient and 'thyroid' in patient.chronic_diseases %}checked{% endif %}>
+                                <label for="thyroid"><i class="fas fa-heartbeat"></i> Choroby tarczycy</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="pcos" name="chronic_diseases" value="pcos" {% if patient and 'pcos' in patient.chronic_diseases %}checked{% endif %}>
+                                <label for="pcos"><i class="fas fa-female"></i> PCOS</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="other_chronic" name="chronic_diseases" value="other" {% if patient and 'other' in patient.chronic_diseases %}checked{% endif %}>
+                                <label for="other_chronic"><i class="fas fa-plus-circle"></i> Inne</label>
+                            </div>
+                        </div>
+                        <textarea id="other_chronic_other" name="chronic_diseases_other" placeholder="Opisz inne choroby przewlekłe" class="form-textarea" style="display: none;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-procedures"></i>
+                            Operacje i zabiegi
+                        </label>
+                        <textarea id="surgeries" name="surgeries" placeholder="Opisz przebyte operacje i zabiegi" class="form-textarea">{{ patient.surgeries if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-notes-medical"></i>
+                            Inne schorzenia
+                        </label>
+                        <textarea id="other_conditions" name="other_conditions" placeholder="Opisz inne schorzenia" class="form-textarea">{{ patient.other_conditions if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-head-side"></i>
+                            Historia chorób skóry głowy
+                        </label>
+                        <textarea id="scalp_history" name="scalp_history" placeholder="Opisz historię chorób skóry głowy" class="form-textarea">{{ patient.scalp_history if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-cut"></i>
+                            Historia zabiegów trychologicznych
+                        </label>
+                        <textarea id="trichology_treatments" name="trichology_treatments" placeholder="Opisz przebyte zabiegi trychologiczne" class="form-textarea">{{ patient.trichology_treatments if patient else '' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Środkowa kolumna - Leki, Suplementy, Alergie -->
+                <div class="form-column">
+                    <div class="form-column-header">
+                        <i class="fas fa-pills"></i>
+                        <h2>Leki i Suplementy</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Leki</label>
+                        <div id="medications-container">
+                            {% if patient and patient.medications %}
+                                {% for med in patient.medications %}
+                                <div class="medication-item">
+                                    <div class="grid-2">
+                                        <div>
+                                            <label>Nazwa leku</label>
+                                            <input type="text" name="medication_name[]" placeholder="np. Metformina" value="{{ med.name }}">
+                                        </div>
+                                        <div>
+                                            <label>Dawka</label>
+                                            <input type="text" name="medication_dose[]" placeholder="np. 500mg" value="{{ med.dose }}">
+                                        </div>
+                                    </div>
+                                    <textarea name="medication_schedule[]" placeholder="Harmonogram przyjmowania" class="form-textarea">{{ med.schedule }}</textarea>
+                                    <button type="button" class="remove-button" onclick="this.parentNode.remove()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="medication-item">
+                                    <div class="grid-2">
+                                        <div>
+                                            <label>Nazwa leku</label>
+                                            <input type="text" name="medication_name[]" placeholder="np. Metformina">
+                                        </div>
+                                        <div>
+                                            <label>Dawka</label>
+                                            <input type="text" name="medication_dose[]" placeholder="np. 500mg">
+                                        </div>
+                                    </div>
+                                    <textarea name="medication_schedule[]" placeholder="Harmonogram przyjmowania" class="form-textarea"></textarea>
+                                    <button type="button" class="remove-button" onclick="this.parentNode.remove()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <button type="button" id="add-medication" class="add-button">
+                            <i class="fas fa-plus"></i> Dodaj kolejny lek
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Suplementy</label>
+                        <div id="supplements-container">
+                            {% if patient and patient.supplements %}
+                                {% for supp in patient.supplements %}
+                                <div class="supplement-item">
+                                    <div class="grid-2">
+                                        <div>
+                                            <label>Nazwa suplementu</label>
+                                            <input type="text" name="supplement_name[]" placeholder="np. Witamina D" value="{{ supp.name }}">
+                                        </div>
+                                        <div>
+                                            <label>Dawka</label>
+                                            <input type="text" name="supplement_dose[]" placeholder="np. 2000 IU" value="{{ supp.dose }}">
+                                        </div>
+                                    </div>
+                                    <textarea name="supplement_schedule[]" placeholder="Harmonogram przyjmowania" class="form-textarea">{{ supp.schedule }}</textarea>
+                                    <button type="button" class="remove-button" onclick="this.parentNode.remove()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="supplement-item">
+                                    <div class="grid-2">
+                                        <div>
+                                            <label>Nazwa suplementu</label>
+                                            <input type="text" name="supplement_name[]" placeholder="np. Witamina D">
+                                        </div>
+                                        <div>
+                                            <label>Dawka</label>
+                                            <input type="text" name="supplement_dose[]" placeholder="np. 2000 IU">
+                                        </div>
+                                    </div>
+                                    <textarea name="supplement_schedule[]" placeholder="Harmonogram przyjmowania" class="form-textarea"></textarea>
+                                    <button type="button" class="remove-button" onclick="this.parentNode.remove()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <button type="button" id="add-supplement" class="add-button">
+                            <i class="fas fa-plus"></i> Dodaj kolejny suplement
+                        </button>
+                    </div>
+
+                    <div class="form-column-header">
+                        <i class="fas fa-spa"></i>
+                        <h2>Pielęgnacja domowa</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-pump-soap"></i>
+                            Szampon
+                        </label>
+                        <input type="text" id="current_shampoo" name="current_shampoo" placeholder="Jaki szampon obecnie używasz?" value="{{ patient.current_shampoo if patient else '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-scrubber"></i>
+                            Peeling skóry głowy
+                        </label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="uses_peeling" name="uses_peeling" value="yes" {% if patient and patient.uses_peeling %}checked{% endif %}>
+                                <label for="uses_peeling"><i class="fas fa-check"></i> Używam peelingu</label>
+                            </div>
+                        </div>
+                        <input type="text" id="peeling_details" name="peeling_details" placeholder="Jaki peeling i jak często?" value="{{ patient.peeling_details if patient else '' }}" style="margin-top: 10px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-tint"></i>
+                            Minoxidil
+                        </label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="uses_minoxidil" name="uses_minoxidil" value="yes" {% if patient and patient.uses_minoxidil %}checked{% endif %}>
+                                <label for="uses_minoxidil"><i class="fas fa-check"></i> Stosuję minoxidil</label>
+                            </div>
+                        </div>
+                        <input type="text" id="minoxidil_details" name="minoxidil_details" placeholder="Jaki preparat, jak długo, jak często?" value="{{ patient.minoxidil_details if patient else '' }}" style="margin-top: 10px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-paint-brush"></i>
+                            Stylizacja włosów
+                        </label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="hair_coloring" name="hair_styling" value="coloring" {% if patient and patient.hair_styling and 'coloring' in patient.hair_styling %}checked{% endif %}>
+                                <label for="hair_coloring"><i class="fas fa-palette"></i> Farbowanie włosów</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="hair_bleaching" name="hair_styling" value="bleaching" {% if patient and patient.hair_styling and 'bleaching' in patient.hair_styling %}checked{% endif %}>
+                                <label for="hair_bleaching"><i class="fas fa-star"></i> Rozjaśnianie włosów</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="hair_perming" name="hair_styling" value="perming" {% if patient and patient.hair_styling and 'perming' in patient.hair_styling %}checked{% endif %}>
+                                <label for="hair_perming"><i class="fas fa-magic"></i> Trwała ondulacja</label>
+                            </div>
+                        </div>
+                        <textarea id="styling_details" name="styling_details" placeholder="Opisz szczegóły stylizacji (jak często, jakie produkty)" class="form-textarea">{{ patient.styling_details if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-cut"></i>
+                            Inne zabiegi fryzjerskie
+                        </label>
+                        <textarea id="other_treatments" name="other_treatments" placeholder="Opisz inne zabiegi fryzjerskie (keratyna, botoks do włosów, itp.)" class="form-textarea">{{ patient.other_treatments if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-column-header">
+                        <i class="fas fa-allergies"></i>
+                        <h2>Alergie</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rodzaje alergii</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="allergy_medication" name="allergies" value="medication" {% if patient and 'medication' in patient.allergies %}checked{% endif %}>
+                                <label for="allergy_medication"><i class="fas fa-pills"></i> Leki</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="allergy_food" name="allergies" value="food" {% if patient and 'food' in patient.allergies %}checked{% endif %}>
+                                <label for="allergy_food"><i class="fas fa-utensils"></i> Pokarmy</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="allergy_environmental" name="allergies" value="environmental" {% if patient and 'environmental' in patient.allergies %}checked{% endif %}>
+                                <label for="allergy_environmental"><i class="fas fa-leaf"></i> Środowiskowe</label>
+                            </div>
+                        </div>
+                        <textarea id="allergies_details" name="allergies_details" placeholder="Opisz szczegóły alergii" class="form-textarea">{{ patient.allergies_details if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Reakcje alergiczne
+                        </label>
+                        <textarea id="allergic_reactions" name="allergic_reactions" placeholder="Opisz reakcje alergiczne" class="form-textarea">{{ patient.allergic_reactions if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-spray-can"></i>
+                            Reakcje alergiczne na kosmetyki
+                        </label>
+                        <textarea id="cosmetic_allergies" name="cosmetic_allergies" placeholder="Opisz reakcje alergiczne na kosmetyki" class="form-textarea">{{ patient.cosmetic_allergies if patient else '' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Prawa kolumna - Styl życia, Wywiad rodzinny i Dodatkowe informacje -->
+                <div class="form-column">
+                    <div class="form-column-header">
+                        <i class="fas fa-heart"></i>
+                        <h2>Styl życia</h2>
+                    </div>
+
+                    <div class="form-group stress-group">
+                        <label>
+                            <i class="fas fa-brain"></i>
+                            Poziom stresu w pracy
+                        </label>
+                        <div class="range-label">
+                            <span><i class="fas fa-smile"></i></span>
+                            <input type="range" id="work_stress" name="work_stress" min="1" max="10" value="{{ patient.work_stress if patient else 5 }}">
+                            <span><i class="fas fa-angry"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group stress-group">
+                        <label>
+                            <i class="fas fa-heart"></i>
+                            Poziom stresu poza pracą
+                        </label>
+                        <div class="range-label">
+                            <span><i class="fas fa-smile"></i></span>
+                            <input type="range" id="life_stress" name="life_stress" min="1" max="10" value="{{ patient.life_stress if patient else 5 }}">
+                            <span><i class="fas fa-angry"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-smoking"></i>
+                            Używki
+                        </label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="smoking" name="habits" value="smoking" {% if patient and 'smoking' in patient.habits %}checked{% endif %}>
+                                <label for="smoking"><i class="fas fa-smoking"></i> Palenie papierosów</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="alcohol" name="habits" value="alcohol" {% if patient and 'alcohol' in patient.habits %}checked{% endif %}>
+                                <label for="alcohol"><i class="fas fa-wine-glass-alt"></i> Alkohol</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="other_drugs" name="habits" value="other_drugs" {% if patient and 'other_drugs' in patient.habits %}checked{% endif %}>
+                                <label for="other_drugs"><i class="fas fa-pills"></i> Inne używki</label>
+                            </div>
+                        </div>
+                        <textarea id="habits_details" name="habits_details" placeholder="Opisz szczegóły dotyczące używek (ile paczek dziennie, ile alkoholu, jakie inne używki)" class="form-textarea" style="display: none;">{{ patient.habits_details if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-utensils"></i>
+                            Dieta
+                        </label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="diet_vegetarian" name="diet" value="vegetarian" {% if patient and 'vegetarian' in patient.diet %}checked{% endif %}>
+                                <label for="diet_vegetarian"><i class="fas fa-seedling"></i> Wegetariańska</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="diet_vegan" name="diet" value="vegan" {% if patient and 'vegan' in patient.diet %}checked{% endif %}>
+                                <label for="diet_vegan"><i class="fas fa-leaf"></i> Wegańska</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="diet_other" name="diet" value="other" {% if patient and 'other' in patient.diet %}checked{% endif %}>
+                                <label for="diet_other"><i class="fas fa-plus-circle"></i> Inna</label>
+                            </div>
+                        </div>
+                        <textarea id="diet_other_other" name="diet_details" placeholder="Opisz szczegóły diety" class="form-textarea" style="display: none;">{{ patient.diet_details if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-running"></i>
+                            Aktywność fizyczna
+                        </label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="activity_regular" name="physical_activity" value="regular" {% if patient and 'regular' in patient.physical_activity %}checked{% endif %}>
+                                <label for="activity_regular"><i class="fas fa-dumbbell"></i> Regularna</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="activity_occasional" name="physical_activity" value="occasional" {% if patient and 'occasional' in patient.physical_activity %}checked{% endif %}>
+                                <label for="activity_occasional"><i class="fas fa-walking"></i> Okazjonalna</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="activity_none" name="physical_activity" value="none" {% if patient and 'none' in patient.physical_activity %}checked{% endif %}>
+                                <label for="activity_none"><i class="fas fa-couch"></i> Brak</label>
+                            </div>
+                        </div>
+                        <textarea id="activity_details" name="activity_details" placeholder="Opisz szczegóły aktywności fizycznej" class="form-textarea" style="display: none;">{{ patient.activity_details if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-moon"></i>
+                            Sen
+                        </label>
+                        <div class="range-label">
+                            <span><i class="fas fa-moon"></i> 4h</span>
+                            <input type="range" id="sleep_hours" name="sleep_hours" min="4" max="12" value="{{ patient.sleep_hours if patient else 8 }}">
+                            <span><i class="fas fa-sun"></i> 12h</span>
+                        </div>
+                        <textarea id="sleep_quality" name="sleep_quality" placeholder="Opisz jakość snu" class="form-textarea">{{ patient.sleep_quality if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-column-header">
+                        <i class="fas fa-users"></i>
+                        <h2>Wywiad rodzinny</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Problemy z wypadaniem włosów w rodzinie</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="family_hair_loss_yes" name="family_hair_loss" value="yes" {% if patient and patient.family_hair_loss == 'yes' %}checked{% endif %}>
+                                <label for="family_hair_loss_yes"><i class="fas fa-check"></i> Tak</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="family_hair_loss_no" name="family_hair_loss" value="no" {% if patient and patient.family_hair_loss == 'no' %}checked{% endif %}>
+                                <label for="family_hair_loss_no"><i class="fas fa-times"></i> Nie</label>
+                            </div>
+                        </div>
+                        <textarea id="family_hair_loss_details" name="family_hair_loss_details" placeholder="Opisz szczegóły problemów z włosami w rodzinie" class="form-textarea">{{ patient.family_hair_loss_details if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-dna"></i>
+                            Choroby genetyczne w rodzinie
+                        </label>
+                        <textarea id="family_genetic_diseases" name="family_genetic_diseases" placeholder="Opisz choroby genetyczne występujące w rodzinie" class="form-textarea">{{ patient.family_genetic_diseases if patient else '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-head-side"></i>
+                            Historia chorób skóry w rodzinie
+                        </label>
+                        <textarea id="family_skin_diseases" name="family_skin_diseases" placeholder="Opisz historię chorób skóry w rodzinie" class="form-textarea">{{ patient.family_skin_diseases if patient else '' }}</textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Sekcja dodatkowych uwag na całą szerokość -->
+            <div class="additional-notes-section">
+                <div class="form-column-header">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h2>Dodatkowe informacje</h2>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-comment-medical"></i>
+                        Uwagi dodatkowe
+                    </label>
+                    <textarea id="additional_notes" name="additional_notes" placeholder="Dodatkowe uwagi i informacje o pacjencie, jego stanie zdrowia, obserwacjach..." class="form-textarea additional-notes-textarea">{{ patient.additional_notes if patient else '' }}</textarea>
+                </div>
+            </div>
+
+            <!-- Przyciski nawigacji -->
+            <div class="form-navigation">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Zapisz dokumentację
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Skrypty -->
+    <script src="{{ url_for('static', filename='js/documentation_form.js') }}"></script>
+</body>
+</html> 
+
+

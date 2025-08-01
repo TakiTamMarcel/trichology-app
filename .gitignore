@@ -1,0 +1,68 @@
+# Pliki konfiguracyjne Google API
+credentials.json
+token.json
+google_calendar_credentials.json
+
+# Bazy danych
+*.db
+*.sqlite
+*.sqlite3
+
+# Pliki logów
+*.log
+logs/
+
+# Pliki cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Środowiska wirtualne
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# System
+.DS_Store
+Thumbs.db
+
+# Pliki tymczasowe
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Uploads (opcjonalnie - usuń jeśli chcesz śledzić pliki)
+static/uploads/
+uploads/
+
+# Pliki konfiguracyjne środowiska
+.env
+.env.local
+.env.production 

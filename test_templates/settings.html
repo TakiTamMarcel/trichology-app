@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ustawienia - Zarządzanie zabiegami</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/documentation_form.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/patient.css') }}?v=2">
+    
+    <style>
+        .treatment-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .treatment-form h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .treatment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .treatment-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .treatment-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .treatment-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .treatment-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .treatment-badge.mezoterapia { background: #3498db; }
+        .treatment-badge.laser { background: #e74c3c; }
+        .treatment-badge.mikronakłuwanie { background: #f39c12; }
+        .treatment-badge.karboksyterapia { background: #27ae60; }
+        .treatment-badge.prp { background: #8e44ad; }
+        .treatment-badge.led { background: #16a085; }
+        .treatment-badge.masaż { background: #d35400; }
+        .treatment-badge.zastrzyki { background: #2c3e50; }
+        .treatment-badge.peeling { background: #e67e22; }
+        .treatment-badge.konsultacja { background: #34495e; }
+        .treatment-badge.inne { background: #95a5a6; }
+        
+        .price-cell {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+        
+        .actions-cell {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-table {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-table.edit {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-table.edit:hover {
+            background: #e0a800;
+        }
+        
+        .btn-table.delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-table.delete:hover {
+            background: #c82333;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .sync-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            margin-bottom: 15px;
+        }
+        
+        .sync-step-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .sync-step-icon.success {
+            background-color: #28a745;
+        }
+        
+        .sync-step-icon.error {
+            background-color: #dc3545;
+        }
+        
+        .sync-step-content h4 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .sync-step-content p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .sync-results-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #d4edda;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .sync-results-header h4 {
+            margin: 0;
+            color: #155724;
+        }
+        
+        .sync-results-header i {
+            color: #28a745;
+        }
+        
+        .sync-results-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .sync-results-item:last-child {
+            border-bottom: none;
+        }
+        
+        .sync-results-item strong {
+            color: #333;
+        }
+        
+        .sync-results-value {
+            color: #007bff;
+            font-weight: 500;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Toggle switch styles */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Google Calendar Integration Styles */
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-badge.status-connected {
+            background-color: #28a745;
+        }
+
+        .status-badge.status-disconnected {
+            background-color: #dc3545;
+        }
+
+        .status-badge.status-connecting {
+            background-color: #ffc107;
+        }
+
+        .btn-google {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-google:hover {
+            background-color: #3367d6;
+        }
+
+        .btn-google i {
+            font-size: 18px;
+        }
+
+
+    </style>
+</head>
+<body class="patient-page">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="fas fa-user-md fa-2x" style="color: white;"></i>
+            <span>Trichology</span>
+        </div>
+        
+        <nav>
+            <a href="/" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/documentation_form" class="nav-item">
+                <i class="fas fa-user-plus"></i>
+                <span>Nowy Pacjent</span>
+            </a>
+            <a href="/polecane-produkty" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>Produkty</span>
+            </a>
+            <a href="/polecani-fryzjerzy" class="nav-item">
+                <i class="fas fa-cut"></i>
+                <span>Fryzjerzy</span>
+            </a>
+            <a href="/polecane-kliniki" class="nav-item">
+                <i class="fas fa-hospital"></i>
+                <span>Kliniki</span>
+            </a>
+            <a href="/settings" class="nav-item active">
+                <i class="fas fa-cog"></i>
+                <span>Ustawienia</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <h1><i class="fas fa-cog"></i> Ustawienia</h1>
+                <p>Zarządzanie dostępnymi zabiegami i cenami</p>
+            </div>
+            <div class="user-profile">
+                <i class="fas fa-user-circle fa-2x" style="color: var(--primary-color);"></i>
+                <span>Dr. Anna Kowalska</span>
+                <span class="role">Trycholog</span>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alert-success" class="alert success">
+            <i class="fas fa-check-circle"></i> <span id="success-message"></span>
+        </div>
+        <div id="alert-error" class="alert error">
+            <i class="fas fa-exclamation-triangle"></i> <span id="error-message"></span>
+        </div>
+        <div id="alert-info" class="alert info">
+            <i class="fas fa-info-circle"></i> <span id="info-message"></span>
+        </div>
+
+        <div class="form-container">
+            <!-- Dodawanie nowego zabiegu -->
+            <div class="form-column" style="grid-column: 1 / -1;">
+                <div class="form-column-header">
+                    <i class="fas fa-plus"></i>
+                    <h2>Dodaj nowy zabieg</h2>
+                </div>
+                
+                <div class="treatment-form">
+                    <form id="add-treatment-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="treatment-name">
+                                    <i class="fas fa-procedures"></i> Nazwa zabiegu
+                                </label>
+                                <input type="text" id="treatment-name" name="name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="treatment-type">
+                                    <i class="fas fa-tag"></i> Typ zabiegu
+                                </label>
+                                <select id="treatment-type" name="type" required>
+                                    <option value="">Wybierz typ</option>
+                                    <option value="mezoterapia">Mezoterapia</option>
+                                    <option value="laser">Laser</option>
+                                    <option value="mikronakłuwanie">Mikronakłuwanie</option>
+                                    <option value="karboksyterapia">Karboksyterapia</option>
+                                    <option value="prp">PRP</option>
+                                    <option value="led">LED</option>
+                                    <option value="masaż">Masaż</option>
+                                    <option value="zastrzyki">Zastrzyki</option>
+                                    <option value="peeling">Peeling</option>
+                                    <option value="konsultacja">Konsultacja</option>
+                                    <option value="inne">Inne</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="treatment-price">
+                                    <i class="fas fa-money-bill-wave"></i> Cena (zł)
+                                </label>
+                                <input type="number" id="treatment-price" name="price" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="treatment-description">
+                                <i class="fas fa-info-circle"></i> Opis (opcjonalnie)
+                            </label>
+                            <textarea id="treatment-description" name="description" rows="3" placeholder="Dodatkowe informacje o zabiegu..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Dodaj zabieg
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Lista zabiegów -->
+            <div class="form-column" style="grid-column: 1 / -1;">
+                <div class="form-column-header">
+                    <i class="fas fa-list"></i>
+                    <h2>Lista zabiegów</h2>
+                </div>
+                
+                <div class="form-group">
+                    <div id="treatments-loading" class="loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Ładowanie...
+                    </div>
+                    
+                    <table class="treatment-table" id="treatments-table">
+                        <thead>
+                            <tr>
+                                <th>Nazwa</th>
+                                <th>Typ</th>
+                                <th>Cena</th>
+                                <th>Opis</th>
+                                <th>Status</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="treatments-tbody">
+                            <!-- Dane będą załadowane przez JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Sekcja ustawień użytkownika -->
+            <div class="form-column" style="grid-column: 1 / -1; margin-top: 40px;">
+                <div class="form-column-header">
+                    <i class="fas fa-user-cog"></i>
+                    <h2>Ustawienia użytkownika</h2>
+                </div>
+                
+                <div class="treatment-form">
+                    <form id="user-settings-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="user-first-name">
+                                    <i class="fas fa-user"></i> Imię
+                                </label>
+                                <input type="text" id="user-first-name" name="first_name" value="Anna" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="user-last-name">
+                                    <i class="fas fa-user"></i> Nazwisko
+                                </label>
+                                <input type="text" id="user-last-name" name="last_name" value="Kowalska" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="user-email">
+                                    <i class="fas fa-envelope"></i> Email
+                                </label>
+                                <input type="email" id="user-email" name="email" value="anna.kowalska@example.com" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="user-role">
+                                    <i class="fas fa-briefcase"></i> Rola
+                                </label>
+                                <select id="user-role" name="role" disabled>
+                                    <option value="trichologist" selected>Trycholog</option>
+                                    <option value="admin">Administrator</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="user-profile-picture">
+                                <i class="fas fa-camera"></i> Zdjęcie profilowe
+                            </label>
+                            <input type="file" id="user-profile-picture" name="profile_picture" accept="image/*">
+                            <small style="color: #6c757d; font-size: 12px;">
+                                Obsługiwane formaty: JPG, PNG, GIF. Maksymalny rozmiar: 5MB
+                            </small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Zapisz profil
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Sekcja zmiany hasła -->
+            <div class="form-column" style="grid-column: 1 / -1; margin-top: 30px;">
+                <div class="form-column-header">
+                    <i class="fas fa-lock"></i>
+                    <h2>Zmiana hasła</h2>
+                </div>
+                
+                <div class="treatment-form">
+                    <form id="change-password-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="current-password">
+                                    <i class="fas fa-lock"></i> Aktualne hasło
+                                </label>
+                                <input type="password" id="current-password" name="current_password" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="new-password">
+                                    <i class="fas fa-key"></i> Nowe hasło
+                                </label>
+                                <input type="password" id="new-password" name="new_password" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirm-new-password">
+                                    <i class="fas fa-key"></i> Potwierdź nowe hasło
+                                </label>
+                                <input type="password" id="confirm-new-password" name="confirm_new_password" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-key"></i> Zmień hasło
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Sekcja integracji z Google Calendar -->
+            <div class="form-column" style="grid-column: 1 / -1; margin-top: 30px;">
+                <div class="form-column-header">
+                    <i class="fab fa-google"></i>
+                    <h2>Integracja z Google Calendar</h2>
+                </div>
+                
+                <div class="treatment-form">
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4><i class="fab fa-google"></i> Synchronizacja z Google Calendar</h4>
+                        <p>
+                            <strong>Dwukierunkowa synchronizacja</strong> - wizyty pacjentów będą automatycznie dodawane do Twojego Google Calendar, 
+                            a prywatne wydarzenia z Google Calendar będą widoczne w aplikacji (bez szczegółów).
+                        </p>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-plug"></i> Status połączenia
+                            </label>
+                            <div class="connection-status">
+                                <span id="google-calendar-status" class="status-badge status-disconnected">
+                                    Sprawdzanie statusu...
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row" id="google-calendar-actions">
+                        <button type="button" class="btn btn-google" onclick="setupGoogleCalendar()" 
+                                id="connect-google-btn">
+                            <i class="fab fa-google"></i> Połącz z Google Calendar
+                        </button>
+                        
+                        <button type="button" class="btn btn-primary" onclick="syncToGoogleCalendar()" 
+                                id="sync-visits-btn" style="display: none;">
+                            <i class="fas fa-sync"></i> Informacje o synchronizacji
+                        </button>
+                        
+                        <button type="button" class="btn btn-secondary" onclick="exportToIcal()" 
+                                id="export-ical-btn">
+                            <i class="fas fa-download"></i> Eksportuj iCal
+                        </button>
+                        
+                        <button type="button" class="btn btn-info" onclick="checkGoogleCalendarStatus()" 
+                                id="check-status-btn">
+                            <i class="fas fa-refresh"></i> Sprawdź status
+                        </button>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                        <h4><i class="fas fa-info-circle"></i> Opcje integracji</h4>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li><strong>🔄 Google API:</strong> Pełna dwukierunkowa synchronizacja (zalecana)</li>
+                            <li><strong>📤 Eksport iCal:</strong> Pobierz plik .ics do importu w Google Calendar</li>
+                            <li><strong>📱 Feed URL:</strong> http://localhost:5001/calendar.ics - dla urządzeń mobilnych</li>
+                            <li><strong>🎨 Kolory:</strong> Wizyty pacjentów (zielone), wydarzenia Google (niebieskie)</li>
+                            <li><strong>🔒 Bezpieczeństwo:</strong> Dane pacjentów widoczne tylko w Google Calendar</li>
+                        </ul>
+                        <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; font-size: 12px;">
+                            <strong>💡 Wskazówka:</strong> Jeśli masz problemy z API, użyj eksportu iCal jako prostej alternatywy.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sekcja wylogowania -->
+            <div class="form-column" style="grid-column: 1 / -1; margin-top: 30px;">
+                <div class="form-column-header">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <h2>Sesja i bezpieczeństwo</h2>
+                </div>
+                
+                <div class="treatment-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-clock"></i> Ostatnie logowanie
+                            </label>
+                            <input type="text" value="2024-01-15 14:30:22" disabled>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-globe"></i> Adres IP
+                            </label>
+                            <input type="text" value="192.168.1.100" disabled>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="logoutAllSessions()">
+                            <i class="fas fa-sign-out-alt"></i> Wyloguj ze wszystkich urządzeń
+                        </button>
+                        
+                        <button type="button" class="btn btn-primary" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i> Wyloguj się
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal edycji zabiegu -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edytuj zabieg</h3>
+                <button class="close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="edit-treatment-form">
+                <input type="hidden" id="edit-treatment-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-treatment-name">
+                            <i class="fas fa-procedures"></i> Nazwa zabiegu
+                        </label>
+                        <input type="text" id="edit-treatment-name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-treatment-type">
+                            <i class="fas fa-tag"></i> Typ zabiegu
+                        </label>
+                        <select id="edit-treatment-type" name="type" required>
+                            <option value="">Wybierz typ</option>
+                            <option value="mezoterapia">Mezoterapia</option>
+                            <option value="laser">Laser</option>
+                            <option value="mikronakłuwanie">Mikronakłuwanie</option>
+                            <option value="karboksyterapia">Karboksyterapia</option>
+                            <option value="prp">PRP</option>
+                            <option value="led">LED</option>
+                            <option value="masaż">Masaż</option>
+                            <option value="zastrzyki">Zastrzyki</option>
+                            <option value="peeling">Peeling</option>
+                            <option value="konsultacja">Konsultacja</option>
+                            <option value="inne">Inne</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-treatment-price">
+                            <i class="fas fa-money-bill-wave"></i> Cena (zł)
+                        </label>
+                        <input type="number" id="edit-treatment-price" name="price" step="0.01" min="0" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-treatment-description">
+                        <i class="fas fa-info-circle"></i> Opis (opcjonalnie)
+                    </label>
+                    <textarea id="edit-treatment-description" name="description" rows="3"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+                        <i class="fas fa-times"></i> Anuluj
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Zapisz zmiany
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Funkcje JavaScript pozostają takie same
+        let treatmentsData = [];
+
+        // Ładowanie zabiegów przy starcie
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTreatments();
+        });
+
+        // Funkcja do ładowania listy zabiegów
+        async function loadTreatments() {
+            try {
+                document.getElementById('treatments-loading').style.display = 'block';
+                const response = await fetch('/api/treatments');
+                
+                if (!response.ok) {
+                    throw new Error('Błąd przy ładowaniu zabiegów');
+                }
+                
+                treatmentsData = await response.json();
+                renderTreatmentsTable();
+            } catch (error) {
+                console.error('Błąd:', error);
+                showAlert('error', 'Nie udało się załadować listy zabiegów');
+            } finally {
+                document.getElementById('treatments-loading').style.display = 'none';
+            }
+        }
+
+        // Funkcja do renderowania tabeli zabiegów
+        function renderTreatmentsTable() {
+            const tbody = document.getElementById('treatments-tbody');
+            tbody.innerHTML = '';
+            
+            treatmentsData.forEach(treatment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${treatment.name}</td>
+                    <td><span class="treatment-badge ${treatment.type}">${treatment.type}</span></td>
+                    <td class="price-cell">${treatment.default_price} zł</td>
+                    <td>${treatment.description || '-'}</td>
+                    <td>
+                        <span class="treatment-badge ${treatment.is_active ? 'mezoterapia' : 'inne'}">
+                            ${treatment.is_active ? 'Aktywny' : 'Nieaktywny'}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn-table edit" onclick="editTreatment(${treatment.id})">
+                            <i class="fas fa-edit"></i> Edytuj
+                        </button>
+                        <button class="btn-table delete" onclick="deleteTreatment(${treatment.id})">
+                            <i class="fas fa-trash"></i> Usuń
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Obsługa formularza dodawania zabiegu
+        document.getElementById('add-treatment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const response = await fetch('/api/treatments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Błąd przy dodawaniu zabiegu');
+                }
+                
+                showAlert('success', 'Zabieg został dodany pomyślnie');
+                this.reset();
+                loadTreatments();
+            } catch (error) {
+                console.error('Błąd:', error);
+                showAlert('error', 'Nie udało się dodać zabiegu');
+            }
+        });
+
+        // Funkcja do edycji zabiegu
+        function editTreatment(id) {
+            const treatment = treatmentsData.find(t => t.id === id);
+            if (!treatment) return;
+            
+            document.getElementById('edit-treatment-id').value = treatment.id;
+            document.getElementById('edit-treatment-name').value = treatment.name;
+            document.getElementById('edit-treatment-type').value = treatment.type;
+            document.getElementById('edit-treatment-price').value = treatment.default_price;
+            document.getElementById('edit-treatment-description').value = treatment.description || '';
+            
+            document.getElementById('edit-modal').style.display = 'block';
+        }
+
+        // Funkcja do zamykania modala edycji
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+
+        // Obsługa formularza edycji zabiegu
+        document.getElementById('edit-treatment-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            const id = data.id;
+            delete data.id;
+            
+            try {
+                const response = await fetch(`/api/treatments/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Błąd przy edycji zabiegu');
+                }
+                
+                showAlert('success', 'Zabieg został zaktualizowany pomyślnie');
+                closeEditModal();
+                loadTreatments();
+            } catch (error) {
+                console.error('Błąd:', error);
+                showAlert('error', 'Nie udało się zaktualizować zabiegu');
+            }
+        });
+
+        // Funkcja do usuwania zabiegu
+        async function deleteTreatment(id) {
+            if (!confirm('Czy na pewno chcesz usunąć ten zabieg?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/treatments/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Błąd przy usuwaniu zabiegu');
+                }
+                
+                showAlert('success', 'Zabieg został usunięty pomyślnie');
+                loadTreatments();
+            } catch (error) {
+                console.error('Błąd:', error);
+                showAlert('error', 'Nie udało się usunąć zabiegu');
+            }
+        }
+
+        // Przechowywanie timeoutów dla alertów
+        let alertTimeouts = {};
+        
+        // Funkcja do wyświetlania alertów
+        function showAlert(type, message) {
+            console.log(`showAlert wywołane z type: ${type}, message: ${message}`);
+            
+            const alertElement = document.getElementById(`alert-${type}`);
+            const messageElement = document.getElementById(`${type}-message`);
+            
+            console.log(`alertElement:`, alertElement);
+            console.log(`messageElement:`, messageElement);
+            
+            if (!alertElement || !messageElement) {
+                console.error(`Alert element dla typu '${type}' nie został znaleziony`);
+                return;
+            }
+            
+            // Anuluj poprzedni timeout dla tego typu alertu
+            if (alertTimeouts[type]) {
+                clearTimeout(alertTimeouts[type]);
+            }
+            
+            // Ukryj wszystkie inne alerty
+            ['success', 'error', 'info'].forEach(alertType => {
+                if (alertType !== type) {
+                    const otherAlert = document.getElementById(`alert-${alertType}`);
+                    if (otherAlert) {
+                        otherAlert.style.display = 'none';
+                    }
+                    if (alertTimeouts[alertType]) {
+                        clearTimeout(alertTimeouts[alertType]);
+                    }
+                }
+            });
+            
+            messageElement.textContent = message;
+            alertElement.style.display = 'block';
+            
+            console.log(`Alert ${type} powinien być teraz widoczny`);
+            
+            // Ustaw nowy timeout
+            alertTimeouts[type] = setTimeout(() => {
+                alertElement.style.display = 'none';
+                delete alertTimeouts[type];
+            }, 5000);
+        }
+
+        // Zamykanie modala przy kliknięciu poza nim
+        window.onclick = function(event) {
+            const modal = document.getElementById('edit-modal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
+        }
+        
+        // =============================================================================
+        // USER SETTINGS FUNCTIONS
+        // =============================================================================
+        
+        // Obsługa formularza ustawień użytkownika
+        document.getElementById('user-settings-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('/api/user/profile', {
+                    method: 'PUT',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Błąd przy aktualizacji profilu');
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', 'Profil został zaktualizowany pomyślnie');
+                    // Optionally update the UI with new data
+                    updateUserProfile(result.user);
+                } else {
+                    showAlert('error', result.error || 'Nie udało się zaktualizować profilu');
+                }
+            } catch (error) {
+                console.error('Błąd:', error);
+                showAlert('error', 'Nie udało się zaktualizować profilu');
+            }
+        });
+        
+        // Obsługa formularza zmiany hasła
+        document.getElementById('change-password-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const newPassword = formData.get('new_password');
+            const confirmPassword = formData.get('confirm_new_password');
+            
+            // Sprawdź czy hasła się zgadzają
+            if (newPassword !== confirmPassword) {
+                showAlert('error', 'Nowe hasła nie są identyczne');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/user/change-password', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Błąd przy zmianie hasła');
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('success', 'Hasło zostało zmienione pomyślnie');
+                    this.reset();
+                } else {
+                    showAlert('error', result.error || 'Nie udało się zmienić hasła');
+                }
+            } catch (error) {
+                console.error('Błąd:', error);
+                showAlert('error', 'Nie udało się zmienić hasła');
+            }
+        });
+        
+        // Funkcja wylogowania
+        async function logout() {
+            if (!confirm('Czy na pewno chcesz się wylogować?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    showAlert('error', 'Błąd podczas wylogowywania');
+                }
+            } catch (error) {
+                console.error('Błąd:', error);
+                showAlert('error', 'Błąd podczas wylogowywania');
+            }
+        }
+        
+        // Funkcja wylogowania ze wszystkich sesji
+        async function logoutAllSessions() {
+            if (!confirm('Czy na pewno chcesz się wylogować ze wszystkich urządzeń?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/logout-all', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    showAlert('error', 'Błąd podczas wylogowywania');
+                }
+            } catch (error) {
+                console.error('Błąd:', error);
+                showAlert('error', 'Błąd podczas wylogowywania');
+            }
+        }
+        
+        // Funkcja aktualizacji profilu użytkownika w UI
+        function updateUserProfile(user) {
+            // Aktualizuj nagłówek z danymi użytkownika
+            const userProfileElement = document.querySelector('.user-profile span');
+            if (userProfileElement) {
+                userProfileElement.textContent = `${user.first_name} ${user.last_name}`;
+            }
+            
+            // Aktualizuj formularz z nowymi danymi
+            document.getElementById('user-first-name').value = user.first_name;
+            document.getElementById('user-last-name').value = user.last_name;
+            document.getElementById('user-email').value = user.email;
+            document.getElementById('user-role').value = user.role;
+        }
+        
+        // Załaduj dane użytkownika przy starcie
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/user/profile');
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        updateUserProfile(result.user);
+                    }
+                }
+            } catch (error) {
+                console.error('Błąd przy ładowaniu profilu:', error);
+            }
+        }
+        
+        // Załaduj profil użytkownika przy starcie
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTreatments();
+            loadUserProfile();
+            
+
+        });
+
+
+        // =============================================================================
+        // GOOGLE CALENDAR INTEGRATION FUNCTIONS
+        // =============================================================================
+
+        // Sprawdzenie statusu Google Calendar przy ładowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            checkGoogleCalendarStatus();
+        });
+
+        async function checkGoogleCalendarStatus() {
+            try {
+                const statusElement = document.getElementById('google-calendar-status');
+                const connectBtn = document.getElementById('connect-google-btn');
+                const syncBtn = document.getElementById('sync-visits-btn');
+                
+                statusElement.textContent = 'Sprawdzanie...';
+                statusElement.className = 'status-badge status-connecting';
+                
+                const response = await fetch('/api/google-calendar-status');
+                const result = await response.json();
+                
+                if (result.connected) {
+                    statusElement.textContent = 'Połączony';
+                    statusElement.className = 'status-badge status-connected';
+                    connectBtn.textContent = '✓ Google Calendar połączony';
+                    connectBtn.disabled = true;
+                    syncBtn.style.display = 'inline-flex';
+                } else {
+                    statusElement.textContent = result.message || 'Niepołączony';
+                    statusElement.className = 'status-badge status-disconnected';
+                    connectBtn.innerHTML = '<i class="fab fa-google"></i> Połącz z Google Calendar';
+                    connectBtn.disabled = false;
+                    syncBtn.style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('Błąd sprawdzania statusu Google Calendar:', error);
+                document.getElementById('google-calendar-status').textContent = 'Błąd sprawdzania';
+                document.getElementById('google-calendar-status').className = 'status-badge status-disconnected';
+            }
+        }
+
+        async function setupGoogleCalendar() {
+            try {
+                showAlert('info', 'Rozpoczynanie autoryzacji Google Calendar...');
+                
+                const response = await fetch('/api/google-calendar-setup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.auth_url) {
+                    showAlert('info', 'Przekierowywanie do Google...');
+                    // Otwórz autoryzację w nowym oknie
+                    window.open(result.auth_url, '_blank', 'width=500,height=600');
+                    
+                    // Sprawdź status co kilka sekund
+                    const checkInterval = setInterval(async () => {
+                        const statusResponse = await fetch('/api/google-calendar-status');
+                        const statusResult = await statusResponse.json();
+                        
+                        if (statusResult.connected) {
+                            clearInterval(checkInterval);
+                            showAlert('success', 'Google Calendar został pomyślnie połączony!');
+                            checkGoogleCalendarStatus();
+                        }
+                    }, 3000);
+                    
+                    // Zatrzymaj sprawdzanie po 2 minutach
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                    }, 120000);
+                    
+                } else {
+                    showAlert('error', result.error || 'Błąd podczas konfiguracji Google Calendar');
+                }
+                
+            } catch (error) {
+                console.error('Błąd konfiguracji Google Calendar:', error);
+                showAlert('error', 'Błąd podczas łączenia z Google Calendar');
+            }
+        }
+
+        async function syncToGoogleCalendar() {
+            try {
+                const syncBtn = document.getElementById('sync-visits-btn');
+                const originalText = syncBtn.innerHTML;
+                
+                syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Synchronizowanie...';
+                syncBtn.disabled = true;
+                
+                showAlert('info', 'Synchronizacja wizyt do Google Calendar...');
+                
+                const response = await fetch('/api/sync-to-google-calendar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                syncBtn.innerHTML = originalText;
+                syncBtn.disabled = false;
+                
+                if (result.success) {
+                    showAlert('success', result.message || 'Synchronizacja zakończona pomyślnie');
+                    
+                    if (result.errors && result.errors.length > 0) {
+                        console.warn('Błędy synchronizacji:', result.errors);
+                    }
+                } else {
+                    showAlert('error', result.error || 'Błąd podczas synchronizacji');
+                }
+                
+            } catch (error) {
+                console.error('Błąd synchronizacji:', error);
+                showAlert('error', 'Błąd podczas synchronizacji wizyt');
+                
+                // Reset przycisku
+                const syncBtn = document.getElementById('sync-visits-btn');
+                syncBtn.innerHTML = '<i class="fas fa-sync"></i> Synchronizuj wizyty';
+                syncBtn.disabled = false;
+            }
+        }
+
+        function exportToIcal() {
+            try {
+                showAlert('info', 'Pobieranie pliku iCal...');
+                
+                // Otwórz URL eksportu w nowym oknie/tagu
+                const exportUrl = '/api/export-ical';
+                const link = document.createElement('a');
+                link.href = exportUrl;
+                link.download = 'wizyty_trychologa.ics';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showAlert('success', 'Plik iCal został pobrany! Możesz go zaimportować do Google Calendar.');
+                
+            } catch (error) {
+                console.error('Błąd eksportu iCal:', error);
+                showAlert('error', 'Błąd podczas eksportu pliku iCal');
+            }
+        }
+
+        // Sprawdź URL parameters po powrocie z Google
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('google_calendar') === 'connected') {
+                showAlert('success', 'Google Calendar został pomyślnie połączony!');
+                checkGoogleCalendarStatus();
+                
+                // Wyczyść URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else if (urlParams.get('error')) {
+                const error = urlParams.get('error');
+                let errorMessage = 'Błąd podczas łączenia z Google Calendar';
+                
+                switch(error) {
+                    case 'authorization_denied':
+                        errorMessage = 'Autoryzacja została anulowana przez użytkownika';
+                        break;
+                    case 'authorization_failed':
+                        errorMessage = 'Błąd podczas autoryzacji Google Calendar';
+                        break;
+                    case 'callback_error':
+                        errorMessage = 'Błąd podczas przetwarzania autoryzacji';
+                        break;
+                }
+                
+                showAlert('error', errorMessage);
+                
+                // Wyczyść URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+
+    </script>
+</body>
+</html> 

@@ -1,0 +1,403 @@
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #ffffff;
+    --text-color: #2c3e50;
+    --text-light: #64748b;
+    --border-color: #e1e8ed;
+    --success-color: #2ecc71;
+    --error-color: #e74c3c;
+    --warning-color: #f39c12;
+    --border-radius: 8px;
+    --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --background-color: #f8f9fa;
+    --surface-color: #ffffff;
+    --hover-color: #357abd;
+    --input-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --sidebar-color: #1E2A38;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+/* Main content z marginesem na sidebar */
+.main-content {
+    margin-left: 260px;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--surface-color);
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: var(--box-shadow);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header h1 i {
+    color: var(--primary-color);
+}
+
+.patient-info {
+    background: linear-gradient(135deg, var(--background-color) 0%, var(--surface-color) 100%);
+    padding: 1.75rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--input-shadow);
+}
+
+.patient-info h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.patient-info h2 i {
+    color: var(--primary-color);
+}
+
+.patient-info p {
+    margin: 0.75rem 0 0;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    background: #fafbfc;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.form-group label.required::after {
+    content: "*";
+    color: var(--error-color);
+    margin-left: 4px;
+}
+
+.form-group input[type="datetime-local"],
+.form-group input[type="text"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: var(--surface-color);
+    box-shadow: var(--input-shadow);
+    font-family: inherit;
+}
+
+.form-group input[type="datetime-local"]:focus,
+.form-group input[type="text"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    outline: none;
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.image-upload {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    background: var(--surface-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.image-upload:hover,
+.image-upload.highlight {
+    border-color: var(--primary-color);
+    background: rgba(74, 144, 226, 0.05);
+}
+
+.image-upload p {
+    margin: 1rem 0 0;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.image-upload p i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.image-upload input[type="file"] {
+    display: none;
+}
+
+.image-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: transform 0.3s ease;
+}
+
+.image-preview img:hover {
+    transform: scale(1.05);
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.primary-button {
+    background: var(--primary-color);
+    color: white;
+}
+
+.primary-button:hover:not(:disabled) {
+    background: var(--hover-color);
+    transform: translateY(-2px);
+}
+
+.secondary-button {
+    background: var(--surface-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.secondary-button:hover:not(:disabled) {
+    background: var(--background-color);
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsywność */
+@media (max-width: 1024px) {
+    .main-content {
+        margin-left: 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    .container {
+        margin: 1rem auto;
+        padding: 1.5rem;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .image-preview {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .image-preview img {
+        height: 120px;
+    }
+}
+
+/* Animacje */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Dodatkowe style dla lepszej UX */
+.form-group:focus-within label {
+    color: var(--primary-color);
+}
+
+.btn:focus {
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+    outline: none;
+}
+
+/* Tooltip dla wymaganych pól */
+.form-group label.required {
+    position: relative;
+}
+
+.form-group label.required:hover::after {
+    content: "To pole jest wymagane";
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: var(--text-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+/* Styl dla aktywnych elementów */
+.form-group input:not(:placeholder-shown),
+.form-group textarea:not(:placeholder-shown),
+.form-group select:not([value=""]) {
+    background: var(--surface-color);
+    border-color: var(--primary-color);
+}
+
+/* Lepsze style dla select */
+.form-group select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    appearance: none;
+}
+
+/* Hover efekty */
+.form-group:hover {
+    background: rgba(74, 144, 226, 0.02);
+}
+
+.patient-info:hover {
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.05) 0%, var(--surface-color) 100%);
+}
+
+ 

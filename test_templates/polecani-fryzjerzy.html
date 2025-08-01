@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trycholog Logiczny Poleca Fryzjerzy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .stylist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .stylist-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .stylist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .stylist-header {
+            display: flex;
+            padding: 20px;
+            gap: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .stylist-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .stylist-info {
+            flex-grow: 1;
+        }
+        .stylist-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stylist-title {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .stylist-location {
+            font-size: 14px;
+            color: #888;
+        }
+        .stylist-body {
+            padding: 20px;
+        }
+        .stylist-description {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        .stylist-specialties {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .specialty-tag {
+            background-color: #f0f0f0;
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 12px;
+            color: #555;
+        }
+        .stylist-contact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .contact-info {
+            font-size: 14px;
+            color: #555;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4a6da7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        .button:hover {
+            background-color: #3a5d97;
+        }
+        .rating {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .stars {
+            color: #ffc107;
+            font-size: 18px;
+            margin-right: 5px;
+        }
+        .review-count {
+            font-size: 14px;
+            color: #777;
+        }
+        .city-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-button {
+            padding: 8px 15px;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .filter-button:hover, .filter-button.active {
+            background-color: #4a6da7;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Trycholog Logiczny Poleca Fryzjerzy</h1>
+            <a href="/" class="button">Powrót do strony głównej</a>
+        </div>
+        
+        <div class="section">
+            <h2>Polecani fryzjerzy specjalizujący się w problemach włosów</h2>
+            <p>Poniżej znajdziesz listę wyselekcjonowanych fryzjerów, którzy mają doświadczenie w pracy z różnymi problemami włosów. Wszyscy polecani specjaliści przeszli odpowiednie szkolenia i rozumieją specyficzne potrzeby osób borykających się z problemami trychologicznymi.</p>
+            
+            <div class="city-filter">
+                <h3>Filtruj według miasta:</h3>
+                <button class="filter-button active">Wszystkie</button>
+                <button class="filter-button">Warszawa</button>
+                <button class="filter-button">Kraków</button>
+                <button class="filter-button">Poznań</button>
+                <button class="filter-button">Wrocław</button>
+                <button class="filter-button">Gdańsk</button>
+            </div>
+            
+            <div class="stylist-grid">
+                <!-- Fryzjer 1 -->
+                <div class="stylist-card">
+                    <div class="stylist-header">
+                        <div class="stylist-avatar" style="background-color: #e0e0e0; display: flex; justify-content: center; align-items: center;">
+                            <span style="color: #999;">Zdjęcie</span>
+                        </div>
+                        <div class="stylist-info">
+                            <div class="stylist-name">Anna Kowalska</div>
+                            <div class="stylist-title">Fryzjer Stylista, Trycholog</div>
+                            <div class="stylist-location">Warszawa, Centrum</div>
+                            <div class="rating">
+                                <div class="stars">★★★★★</div>
+                                <div class="review-count">(42 opinie)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stylist-body">
+                        <div class="stylist-description">
+                            Specjalistka z 15-letnim doświadczeniem w pracy z trudnymi przypadkami włosów. Ukończyła szkolenia z zakresu trychologii kosmetycznej i świetnie radzi sobie z problemami takimi jak łysienie androgenowe czy łupież.
+                        </div>
+                        <div class="stylist-specialties">
+                            <span class="specialty-tag">Łysienie androgenowe</span>
+                            <span class="specialty-tag">Łupież</span>
+                            <span class="specialty-tag">Suche włosy</span>
+                            <span class="specialty-tag">Pielęgnacja skóry głowy</span>
+                        </div>
+                        <div class="stylist-contact">
+                            <div class="contact-info">Tel: 123-456-789</div>
+                            <button class="button">Umów wizytę</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Fryzjer 2 -->
+                <div class="stylist-card">
+                    <div class="stylist-header">
+                        <div class="stylist-avatar" style="background-color: #e0e0e0; display: flex; justify-content: center; align-items: center;">
+                            <span style="color: #999;">Zdjęcie</span>
+                        </div>
+                        <div class="stylist-info">
+                            <div class="stylist-name">Piotr Nowak</div>
+                            <div class="stylist-title">Barber, Specjalista od włosów męskich</div>
+                            <div class="stylist-location">Kraków, Stare Miasto</div>
+                            <div class="rating">
+                                <div class="stars">★★★★☆</div>
+                                <div class="review-count">(28 opinii)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stylist-body">
+                        <div class="stylist-description">
+                            Piotr specjalizuje się w pielęgnacji męskich włosów i brody, ze szczególnym uwzględnieniem problemów takich jak zakola, przerzedzenie włosów i wypadanie. Stosuje specjalne techniki cięcia maskujące problem przerzedzonych włosów.
+                        </div>
+                        <div class="stylist-specialties">
+                            <span class="specialty-tag">Włosy męskie</span>
+                            <span class="specialty-tag">Zakola</span>
+                            <span class="specialty-tag">Przerzedzenie włosów</span>
+                            <span class="specialty-tag">Techniki maskujące</span>
+                        </div>
+                        <div class="stylist-contact">
+                            <div class="contact-info">Tel: 987-654-321</div>
+                            <button class="button">Umów wizytę</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Fryzjer 3 -->
+                <div class="stylist-card">
+                    <div class="stylist-header">
+                        <div class="stylist-avatar" style="background-color: #e0e0e0; display: flex; justify-content: center; align-items: center;">
+                            <span style="color: #999;">Zdjęcie</span>
+                        </div>
+                        <div class="stylist-info">
+                            <div class="stylist-name">Magdalena Wiśniewska</div>
+                            <div class="stylist-title">Fryzjer Koloryzacja, Specjalista od włosów zniszczonych</div>
+                            <div class="stylist-location">Poznań, Jeżyce</div>
+                            <div class="rating">
+                                <div class="stars">★★★★★</div>
+                                <div class="review-count">(35 opinii)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stylist-body">
+                        <div class="stylist-description">
+                            Magda jest ekspertem w koloryzacji i rewitalizacji włosów zniszczonych zabiegami chemicznymi. Stosuje profesjonalne techniki odbudowy struktury włosa i dobiera zabiegi indywidualnie do potrzeb klienta.
+                        </div>
+                        <div class="stylist-specialties">
+                            <span class="specialty-tag">Włosy zniszczone</span>
+                            <span class="specialty-tag">Koloryzacja</span>
+                            <span class="specialty-tag">Odbudowa włosa</span>
+                            <span class="specialty-tag">Zabiegi nawilżające</span>
+                        </div>
+                        <div class="stylist-contact">
+                            <div class="contact-info">Tel: 111-222-333</div>
+                            <button class="button">Umów wizytę</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Fryzjer 4 -->
+                <div class="stylist-card">
+                    <div class="stylist-header">
+                        <div class="stylist-avatar" style="background-color: #e0e0e0; display: flex; justify-content: center; align-items: center;">
+                            <span style="color: #999;">Zdjęcie</span>
+                        </div>
+                        <div class="stylist-info">
+                            <div class="stylist-name">Tomasz Kowalczyk</div>
+                            <div class="stylist-title">Fryzjer, Trycholog, Doradca</div>
+                            <div class="stylist-location">Wrocław, Nadodrze</div>
+                            <div class="rating">
+                                <div class="stars">★★★★☆</div>
+                                <div class="review-count">(19 opinii)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stylist-body">
+                        <div class="stylist-description">
+                            Tomasz łączy wiedzę trychologiczną z umiejętnościami fryzjerskimi, oferując kompleksowe podejście do problemów z włosami. Specjalizuje się w diagnostyce i doborze odpowiedniej pielęgnacji domowej.
+                        </div>
+                        <div class="stylist-specialties">
+                            <span class="specialty-tag">Diagnostyka włosów</span>
+                            <span class="specialty-tag">Doradztwo</span>
+                            <span class="specialty-tag">Indywidualne programy pielęgnacji</span>
+                            <span class="specialty-tag">Łysienie plackowate</span>
+                        </div>
+                        <div class="stylist-contact">
+                            <div class="contact-info">Tel: 444-555-666</div>
+                            <button class="button">Umów wizytę</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Dlaczego warto wybrać polecanego fryzjera?</h2>
+            <ul>
+                <li>Specjalistyczna wiedza z zakresu trychologii i pielęgnacji problematycznych włosów</li>
+                <li>Doświadczenie w pracy z różnymi schorzeniami skóry głowy i włosów</li>
+                <li>Znajomość specjalistycznych produktów i technik fryzjerskich</li>
+                <li>Indywidualne podejście do każdego przypadku</li>
+                <li>Regularne szkolenia i aktualizacja wiedzy</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Skrypt do obsługi filtrowania fryzjerów według miasta
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.filter-button');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Usunięcie klasy active ze wszystkich przycisków
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Dodanie klasy active do klikniętego przycisku
+                    this.classList.add('active');
+                    
+                    // Tutaj można dodać logikę filtrowania fryzjerów
+                    // Na razie jest to tylko demonstracja UI
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

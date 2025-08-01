@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trycholog Kliniczny Poleca Kliniki przeszczepu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .clinics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .clinic-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .clinic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .clinic-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .clinic-image {
+            flex: 1;
+            min-width: 300px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+        .clinic-info {
+            flex: 2;
+            min-width: 300px;
+            padding: 25px;
+        }
+        .clinic-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .clinic-location {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .clinic-description {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .clinic-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .clinic-feature {
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-size: 14px;
+            color: #444;
+            display: flex;
+            align-items: center;
+        }
+        .clinic-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 25px;
+            background-color: #4a6da7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        .button:hover {
+            background-color: #3a5d97;
+        }
+        .clinic-contact {
+            font-size: 14px;
+            color: #555;
+        }
+        .rating {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .stars {
+            color: #ffc107;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+        .review-count {
+            font-size: 14px;
+            color: #777;
+        }
+        .procedure-details {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .procedure-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+        }
+        .procedure-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .procedure-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .procedure-list li:last-child {
+            border-bottom: none;
+        }
+        .city-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-button {
+            padding: 8px 15px;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .filter-button:hover, .filter-button.active {
+            background-color: #4a6da7;
+            color: white;
+        }
+        .location-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            background-color: #666;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath d='M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z'/%3E%3C/svg%3E");
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath d='M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z'/%3E%3C/svg%3E");
+            mask-size: cover;
+            -webkit-mask-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Trycholog Kliniczny Poleca Kliniki przeszczepu</h1>
+            <a href="/" class="button">Powrót do strony głównej</a>
+        </div>
+        
+        <div class="section">
+            <h2>Polecane kliniki przeszczepu włosów</h2>
+            <p>Poniżej znajdziesz listę renomowanych klinik specjalizujących się w przeszczepie włosów, rekomendowanych przez naszych ekspertów. Każda z tych placówek stosuje najnowocześniejsze techniki i posiada doświadczony zespół specjalistów.</p>
+            
+            <div class="city-filter">
+                <h3>Filtruj według miasta:</h3>
+                <button class="filter-button active">Wszystkie</button>
+                <button class="filter-button">Warszawa</button>
+                <button class="filter-button">Kraków</button>
+                <button class="filter-button">Poznań</button>
+                <button class="filter-button">Wrocław</button>
+                <button class="filter-button">Gdańsk</button>
+            </div>
+            
+            <div class="clinics-grid">
+                <!-- Klinika 1 -->
+                <div class="clinic-card">
+                    <div class="clinic-container">
+                        <div class="clinic-image">
+                            <span style="color: #999; font-size: 18px;">Zdjęcie kliniki</span>
+                        </div>
+                        <div class="clinic-info">
+                            <div class="clinic-name">HairMed Centrum Przeszczepu Włosów</div>
+                            <div class="clinic-location">
+                                <span class="location-icon"></span>Warszawa, ul. Nowogrodzka 42
+                            </div>
+                            <div class="rating">
+                                <div class="stars">★★★★★</div>
+                                <div class="review-count">(87 opinii)</div>
+                            </div>
+                            <div class="clinic-description">
+                                HairMed to wiodąca klinika specjalizująca się w nowoczesnych metodach przeszczepu włosów. Zespół doświadczonych specjalistów wykonuje zabiegi metodami FUE, FUT oraz najnowszą DHI. Klinika słynie z precyzji, naturalnych efektów oraz kompleksowej opieki przed i pozabiegowej.
+                            </div>
+                            <div class="clinic-features">
+                                <span class="clinic-feature">Metoda FUE</span>
+                                <span class="clinic-feature">Metoda FUT</span>
+                                <span class="clinic-feature">Metoda DHI</span>
+                                <span class="clinic-feature">Diagnostyka włosów</span>
+                                <span class="clinic-feature">Konsultacje online</span>
+                            </div>
+                            <div class="procedure-details">
+                                <div class="procedure-title">Dostępne zabiegi i orientacyjne ceny:</div>
+                                <ul class="procedure-list">
+                                    <li><span>Przeszczep FUE (1000 graftów)</span> <span>8 000 - 10 000 zł</span></li>
+                                    <li><span>Przeszczep FUT (do 2000 graftów)</span> <span>12 000 - 15 000 zł</span></li>
+                                    <li><span>Przeszczep DHI (1000 graftów)</span> <span>10 000 - 12 000 zł</span></li>
+                                    <li><span>Konsultacja z trichogramem</span> <span>300 - 500 zł</span></li>
+                                </ul>
+                            </div>
+                            <div class="clinic-action">
+                                <div class="clinic-contact">Tel: 22 123-45-67</div>
+                                <a href="#" class="button">Umów konsultację</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Klinika 2 -->
+                <div class="clinic-card">
+                    <div class="clinic-container">
+                        <div class="clinic-image">
+                            <span style="color: #999; font-size: 18px;">Zdjęcie kliniki</span>
+                        </div>
+                        <div class="clinic-info">
+                            <div class="clinic-name">TricoClinic Kraków</div>
+                            <div class="clinic-location">
+                                <span class="location-icon"></span>Kraków, ul. Dietla 64
+                            </div>
+                            <div class="rating">
+                                <div class="stars">★★★★☆</div>
+                                <div class="review-count">(53 opinie)</div>
+                            </div>
+                            <div class="clinic-description">
+                                TricoClinic to nowoczesny ośrodek medyczny, oferujący zaawansowane metody leczenia łysienia. Specjalizuje się w mikrochirurgicznym przeszczepie włosów, zapewniając naturalne efekty i minimalną inwazyjność. Klinika oferuje także zabiegi regeneracyjne skóry głowy oraz terapie osoczem bogatopłytkowym.
+                            </div>
+                            <div class="clinic-features">
+                                <span class="clinic-feature">Mikrochirurgiczny przeszczep</span>
+                                <span class="clinic-feature">Terapia PRP</span>
+                                <span class="clinic-feature">Bezbolesne znieczulenie</span>
+                                <span class="clinic-feature">Opieka pozabiegowa</span>
+                            </div>
+                            <div class="procedure-details">
+                                <div class="procedure-title">Dostępne zabiegi i orientacyjne ceny:</div>
+                                <ul class="procedure-list">
+                                    <li><span>Mikrochirurgiczny przeszczep (1000 graftów)</span> <span>9 000 - 11 000 zł</span></li>
+                                    <li><span>Terapia osoczem bogatopłytkowym (PRP)</span> <span>800 - 1 200 zł</span></li>
+                                    <li><span>Mezoterapia skóry głowy</span> <span>500 - 700 zł</span></li>
+                                    <li><span>Konsultacja trychologiczna</span> <span>200 - 300 zł</span></li>
+                                </ul>
+                            </div>
+                            <div class="clinic-action">
+                                <div class="clinic-contact">Tel: 12 987-65-43</div>
+                                <a href="#" class="button">Umów konsultację</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Klinika 3 -->
+                <div class="clinic-card">
+                    <div class="clinic-container">
+                        <div class="clinic-image">
+                            <span style="color: #999; font-size: 18px;">Zdjęcie kliniki</span>
+                        </div>
+                        <div class="clinic-info">
+                            <div class="clinic-name">HairRestore Poznań</div>
+                            <div class="clinic-location">
+                                <span class="location-icon"></span>Poznań, ul. Garbary 71
+                            </div>
+                            <div class="rating">
+                                <div class="stars">★★★★★</div>
+                                <div class="review-count">(42 opinie)</div>
+                            </div>
+                            <div class="clinic-description">
+                                HairRestore to klinika z wieloletnim doświadczeniem, stosująca unikalne podejście do leczenia łysienia. Łączy najnowocześniejsze technologie przeszczepu włosów z holistycznym podejściem do zdrowia skóry głowy. Klinika oferuje także innowacyjne metody stymulacji mieszków włosowych.
+                            </div>
+                            <div class="clinic-features">
+                                <span class="clinic-feature">Metoda FUE</span>
+                                <span class="clinic-feature">Laserowa stymulacja</span>
+                                <span class="clinic-feature">Farmakoterapia</span>
+                                <span class="clinic-feature">Zabiegi trychologiczne</span>
+                            </div>
+                            <div class="procedure-details">
+                                <div class="procedure-title">Dostępne zabiegi i orientacyjne ceny:</div>
+                                <ul class="procedure-list">
+                                    <li><span>Przeszczep FUE (1000 graftów)</span> <span>9 500 - 11 500 zł</span></li>
+                                    <li><span>Laserowa stymulacja mieszków (sesja)</span> <span>300 - 500 zł</span></li>
+                                    <li><span>Kompleksowa terapia łysienia (3 miesiące)</span> <span>2 000 - 3 000 zł</span></li>
+                                    <li><span>Diagnostyka wraz z planem leczenia</span> <span>400 - 600 zł</span></li>
+                                </ul>
+                            </div>
+                            <div class="clinic-action">
+                                <div class="clinic-contact">Tel: 61 456-78-90</div>
+                                <a href="#" class="button">Umów konsultację</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Jak wybrać odpowiednią klinikę przeszczepu włosów?</h2>
+            <p>Wybór odpowiedniej kliniki to kluczowy element powodzenia zabiegu przeszczepu włosów. Oto najważniejsze kryteria, którymi warto się kierować:</p>
+            <ul>
+                <li><strong>Doświadczenie i kwalifikacje personelu</strong> - sprawdź, jak długo klinika działa na rynku i jakie kwalifikacje posiadają lekarze.</li>
+                <li><strong>Stosowane metody</strong> - nowoczesne kliniki powinny oferować różne techniki przeszczepu (FUE, FUT, DHI).</li>
+                <li><strong>Portfolio i referencje</strong> - poproś o zdjęcia przed i po zabiegach oraz opinie pacjentów.</li>
+                <li><strong>Opieka pozabiegowa</strong> - dobra klinika zapewnia kompleksową opiekę również po zabiegu.</li>
+                <li><strong>Realność obietnic</strong> - unikaj miejsc obiecujących nierealne efekty lub wyjątkowo niskie ceny.</li>
+                <li><strong>Konsultacja wstępna</strong> - profesjonalna klinika zawsze przeprowadza dokładną diagnostykę i omawia realistyczne oczekiwania.</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>Przygotowanie do zabiegu przeszczepu włosów</h2>
+            <p>Odpowiednie przygotowanie zwiększa szanse na powodzenie zabiegu i minimalizuje ryzyko powikłań. Oto ogólne zalecenia:</p>
+            <ol>
+                <li>Minimum 2 tygodnie przed zabiegiem unikaj alkoholu i palenia tytoniu.</li>
+                <li>Na 10 dni przed zabiegiem przestań przyjmować leki przeciwzapalne i rozrzedzające krew (po konsultacji z lekarzem).</li>
+                <li>Na tydzień przed zabiegiem ogranicz aktywność fizyczną.</li>
+                <li>Dzień przed zabiegiem dokładnie umyj włosy szamponem antybakteryjnym.</li>
+                <li>W dniu zabiegu ubierz się w wygodne ubranie z rozpinanym przodem.</li>
+                <li>Zorganizuj transport do domu po zabiegu - nie będziesz mógł prowadzić samochodu.</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script>
+        // Skrypt do obsługi filtrowania klinik według miasta
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.filter-button');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Usunięcie klasy active ze wszystkich przycisków
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Dodanie klasy active do klikniętego przycisku
+                    this.classList.add('active');
+                    
+                    // Tutaj można dodać logikę filtrowania klinik
+                    // Na razie jest to tylko demonstracja UI
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

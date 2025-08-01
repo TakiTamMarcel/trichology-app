@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Trichology</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fullcalendar.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tippy.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_kanban.css') }}">
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/fullcalendar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tippy.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main_kanban.js') }}"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="fas fa-user-md fa-2x" style="color: white;"></i>
+            <span>Trichology</span>
+        </div>
+        
+        <nav>
+            <a href="/" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/documentation_form" class="nav-item">
+                <i class="fas fa-user-plus"></i>
+                <span>Nowy Pacjent</span>
+            </a>
+            <a href="/polecane-produkty" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>Produkty</span>
+            </a>
+            <a href="/polecani-fryzjerzy" class="nav-item">
+                <i class="fas fa-cut"></i>
+                <span>Fryzjerzy</span>
+            </a>
+            <a href="/polecane-kliniki" class="nav-item">
+                <i class="fas fa-hospital"></i>
+                <span>Kliniki</span>
+            </a>
+            <a href="/settings" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Ustawienia</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <h1>Dashboard</h1>
+                <p>Witaj w panelu trychologa. Poniżej znajdziesz przegląd aktualnych danych.</p>
+            </div>
+            <div class="user-profile">
+                <i class="fas fa-user-circle fa-2x" style="color: var(--primary-color);"></i>
+                <span>Dr. Anna Kowalska</span>
+                <span class="role">Trycholog</span>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="patientSearchInput" class="search-input" 
+                   placeholder="Szukaj pacjenta po nazwisku, imieniu lub PESEL..."
+                   oninput="searchPatients()">
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 id="patientsCount">0</h3>
+                    <p>Pacjenci</p>
+                </div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 id="visitsCount">0</h3>
+                    <p>Wizyty w tym miesiącu</p>
+                </div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stats-info">
+                    <h3 id="tasksCount">0</h3>
+                    <p>Zadania</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Pacjenci -->
+            <div class="dashboard-column">
+                <div class="dashboard-column-header">
+                    <h2 class="dashboard-column-title">Pacjenci</h2>
+                    <a href="/documentation_form" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Nowy Pacjent</span>
+                    </a>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nazwisko i Imię</th>
+                                <th>PESEL</th>
+                                <th>Telefon</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Kalendarz -->
+            <div class="dashboard-column">
+                <div class="dashboard-column-header">
+                    <h2 class="dashboard-column-title">Kalendarz</h2>
+                </div>
+                <div id="calendar"></div>
+            </div>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">Zadania</h2>
+                <button class="btn btn-primary" id="addTaskBtn">
+                    <i class="fas fa-plus"></i>
+                    <span>Dodaj zadanie</span>
+                </button>
+            </div>
+            
+            <div class="main-kanban-board">
+                <!-- Kolumna "Do zrobienia" -->
+                <div class="main-kanban-column main-kanban-todo">
+                    <div class="main-kanban-column-header">Do zrobienia</div>
+                    <div class="main-kanban-cards" id="todo-column">
+                        <!-- Tutaj będą zadania do zrobienia -->
+                    </div>
+                </div>
+                
+                <!-- Kolumna "W trakcie" -->
+                <div class="main-kanban-column main-kanban-in-progress">
+                    <div class="main-kanban-column-header">W trakcie</div>
+                    <div class="main-kanban-cards" id="in-progress-column">
+                        <!-- Tutaj będą zadania w trakcie -->
+                    </div>
+                </div>
+                
+                <!-- Kolumna "Zakończone" -->
+                <div class="main-kanban-column main-kanban-done">
+                    <div class="main-kanban-column-header">Zakończone</div>
+                    <div class="main-kanban-cards" id="done-column">
+                        <!-- Tutaj będą zakończone zadania -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-section">
+            <h2><i class="fas fa-user-plus"></i> Nowa Dokumentacja</h2>
+            <p>Rozpocznij dokumentację nowego pacjenta</p>
+            <a href="/new-documentation" class="button">Rozpocznij <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </main>
+
+    <!-- Modal do dodawania zadania -->
+    <div id="addTaskModal" class="main-kanban-modal">
+        <div class="main-kanban-modal-content">
+            <div class="main-kanban-modal-header">
+                <h3>Dodaj nowe zadanie</h3>
+                <span class="main-kanban-modal-close">&times;</span>
+            </div>
+            
+            <form id="addTaskForm">
+                <div class="main-kanban-form-group">
+                    <label for="taskTitle">Tytuł zadania</label>
+                    <input type="text" id="taskTitle" required placeholder="Wprowadź tytuł zadania">
+                </div>
+                
+                <div class="main-kanban-form-group">
+                    <label for="taskDescription">Opis zadania</label>
+                    <textarea id="taskDescription" placeholder="Wprowadź szczegóły zadania"></textarea>
+                </div>
+                
+                <div class="main-kanban-form-group">
+                    <input type="checkbox" id="assignToPatient">
+                    <label for="assignToPatient">Przypisz do pacjenta</label>
+                </div>
+                
+                <div id="patientSelectionContainer" style="display: none;">
+                    <div class="main-kanban-form-group">
+                        <label for="patientSearch">Wyszukaj pacjenta</label>
+                        <input type="text" id="patientSearch" placeholder="Wprowadź nazwisko, imię lub PESEL">
+                    </div>
+                    <div id="patientsList" style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
+                        <!-- Lista pacjentów -->
+                    </div>
+                </div>
+                
+                <button type="submit" class="main-kanban-submit-btn">Dodaj zadanie</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Click Modal -->
+    <div id="eventClickModal" class="modal">
+        <div class="modal-content">
+            <button class="close-button" onclick="hideEventClickModal()">×</button>
+            <h3 id="eventClickModalTitle"></h3>
+            <div class="modal-buttons">
+                <button class="modal-button secondary" id="viewPatientButton">
+                    Zobacz kartę pacjenta
+                </button>
+                <button class="modal-button primary" id="addVisitButton">
+                    Dodaj nową wizytę
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Visit Modal -->
+    <div id="newVisitModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nowa wizyta</h2>
+                <button class="close-button" onclick="hideNewVisitModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="visitPatientSearch" class="search-input" 
+                           placeholder="Szukaj pacjenta po nazwisku, imieniu lub PESEL...">
+                </div>
+                <div class="table-container">
+                    <table id="patientsModalTable" class="table">
+                        <thead>
+                            <tr>
+                                <th>Nazwisko i Imię</th>
+                                <th>PESEL</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="hideNewVisitModal()" class="btn btn-secondary">Anuluj</button>
+                <button onclick="createNewPatient()" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Nowy Pacjent</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pobierz statystyki
+            fetch('/api/dashboard-stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('patientsCount').textContent = data.data.patients_count;
+                        document.getElementById('visitsCount').textContent = data.data.visits_count;
+                        document.getElementById('tasksCount').textContent = data.data.tasks_count;
+                    }
+                })
+                .catch(error => console.error('Error loading stats:', error));
+
+            // Inicjalizacja kalendarza
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'pl',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: function(info, successCallback, failureCallback) {
+                    // Użyj kombinowanego endpointa z Google Calendar
+                    fetch('/api/calendar-events-combined' + 
+                        '?start=' + info.start.toISOString() + 
+                        '&end=' + info.end.toISOString()).then(r => r.json())
+                    .then((combinedEvents) => {
+                        successCallback(combinedEvents);
+                    }).catch(error => {
+                        console.error('Błąd podczas ładowania wydarzeń:', error);
+                        // Fallback do lokalnych wydarzeń
+                        fetch('/api/calendar-events' + 
+                            '?start=' + info.start.toISOString() + 
+                            '&end=' + info.end.toISOString()).then(r => r.json())
+                        .then((localEvents) => {
+                            successCallback(localEvents);
+                        }).catch(fallbackError => {
+                            console.error('Błąd fallback:', fallbackError);
+                            failureCallback(fallbackError);
+                        });
+                    });
+                },
+                dateClick: function(info) {
+                    showNewVisitModal(info.date);
+                },
+                eventDidMount: function(info) {
+                    if (info.event.extendedProps.description) {
+                        tippy(info.el, {
+                            content: info.event.extendedProps.description,
+                            placement: 'top'
+                        });
+                    }
+                },
+                eventClick: function(info) {
+                    showEventClickModal(info.event);
+                }
+            });
+            
+            calendar.render();
+            loadPatients();
+        });
+
+        // Funkcje do obsługi pacjentów
+        async function loadPatients() {
+            try {
+                const response = await fetch('/api/search-patients', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: '' })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    displayPatients(data.patients);
+                }
+            } catch (error) {
+                console.error('Error loading patients:', error);
+            }
+        }
+
+        function displayPatients(patients) {
+            const tbody = document.getElementById('patientsTableBody');
+            tbody.innerHTML = '';
+            
+            if (patients.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Brak pacjentów</td></tr>';
+                return;
+            }
+            
+            patients.forEach(patient => {
+                const row = document.createElement('tr');
+                const lastVisit = patient.last_visit ? new Date(patient.last_visit).toLocaleDateString('pl-PL') : 'Brak wizyt';
+                
+                row.innerHTML = `
+                    <td>${patient.last_name} ${patient.first_name}</td>
+                    <td>${patient.pesel}</td>
+                    <td>${patient.phone}</td>
+                    <td>
+                        <button class="btn btn-icon" onclick="window.location.href='/patient/${patient.pesel}'">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        async function searchPatients() {
+            const query = document.getElementById('patientSearchInput').value.trim();
+            
+            try {
+                const response = await fetch('/api/search-patients', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    displayPatients(data.patients);
+                }
+            } catch (error) {
+                console.error('Error searching patients:', error);
+            }
+        }
+
+        // Funkcje do obsługi kalendarza i wizyt
+        let selectedDate = null;
+
+        function showNewVisitModal(date) {
+            selectedDate = date;
+            document.getElementById('newVisitModal').style.display = 'flex';
+            loadPatientsForModal();
+            
+            // Dodaj obsługę wyszukiwania w modalu
+            document.getElementById('visitPatientSearch').addEventListener('input', function() {
+                searchPatientsForModal(this.value);
+            });
+        }
+
+        function hideNewVisitModal() {
+            document.getElementById('newVisitModal').style.display = 'none';
+            document.getElementById('visitPatientSearch').value = '';
+        }
+
+        function showEventClickModal(event) {
+            const modal = document.getElementById('eventClickModal');
+            const title = document.getElementById('eventClickModalTitle');
+            const viewButton = document.getElementById('viewPatientButton');
+            const addButton = document.getElementById('addVisitButton');
+            
+            title.textContent = `Pacjent: ${event.title}`;
+            viewButton.onclick = () => window.location.href = `/patient/${event.extendedProps.pesel}`;
+            addButton.onclick = () => {
+                const today = new Date().toISOString().split('T')[0];
+                window.location.href = `/new-visit/${event.extendedProps.pesel}?date=${today}&return_to=calendar`;
+            };
+            
+            modal.style.display = 'flex';
+        }
+
+        function hideEventClickModal() {
+            document.getElementById('eventClickModal').style.display = 'none';
+        }
+
+        async function loadPatientsForModal() {
+            try {
+                const response = await fetch('/api/search-patients', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: '' })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    displayPatientsInModal(data.patients);
+                }
+            } catch (error) {
+                console.error('Error loading patients for modal:', error);
+            }
+        }
+
+        async function searchPatientsForModal(query) {
+            try {
+                const response = await fetch('/api/search-patients', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    displayPatientsInModal(data.patients);
+                }
+            } catch (error) {
+                console.error('Error searching patients for modal:', error);
+            }
+        }
+
+        function displayPatientsInModal(patients) {
+            const tbody = document.querySelector('#patientsModalTable tbody');
+            tbody.innerHTML = '';
+            
+            if (patients.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" style="text-align: center;">Brak pacjentów</td></tr>';
+                return;
+            }
+            
+            patients.forEach(patient => {
+                const row = document.createElement('tr');
+                row.style.cursor = 'pointer';
+                row.onclick = () => selectPatientForVisit(patient.pesel);
+                
+                row.innerHTML = `
+                    <td>${patient.last_name} ${patient.first_name}</td>
+                    <td>${patient.pesel}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function selectPatientForVisit(pesel) {
+            if (!selectedDate) {
+                console.error('No date selected!');
+                return;
+            }
+            
+            // Formatuj datę bez konwersji strefy czasowej
+            const year = selectedDate.getFullYear();
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            const day = String(selectedDate.getDate()).padStart(2, '0');
+            const visitDate = `${year}-${month}-${day}`;
+            
+            window.location.href = `/new-visit/${pesel}?date=${visitDate}&return_to=calendar`;
+            
+            // Resetujemy selectedDate dopiero po przekierowaniu
+            selectedDate = null;
+        }
+
+        function createNewPatient() {
+            hideNewVisitModal();
+            window.location.href = '/documentation_form';
+        }
+
+        // Dodaj obsługę kliknięcia poza modalem
+        window.onclick = function(event) {
+            const newVisitModal = document.getElementById('newVisitModal');
+            const eventClickModal = document.getElementById('eventClickModal');
+            
+            if (event.target === newVisitModal) {
+                hideNewVisitModal();
+            }
+            if (event.target === eventClickModal) {
+                hideEventClickModal();
+            }
+        }
+    </script>
+</body>
+</html> 

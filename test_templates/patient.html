@@ -1,0 +1,3153 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karta Pacjenta - {{ patient.name }} {{ patient.surname }}</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/documentation_form.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/patient.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/photo-editor.css') }}?v=2">
+</head>
+<body class="patient-page">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="fas fa-user-md fa-2x" style="color: white;"></i>
+            <span>Trichology</span>
+        </div>
+        
+        <nav>
+            <a href="/" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/documentation_form" class="nav-item">
+                <i class="fas fa-user-plus"></i>
+                <span>Nowy Pacjent</span>
+            </a>
+            <a href="/polecane-produkty" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>Produkty</span>
+            </a>
+            <a href="/polecani-fryzjerzy" class="nav-item">
+                <i class="fas fa-cut"></i>
+                <span>Fryzjerzy</span>
+            </a>
+            <a href="/polecane-kliniki" class="nav-item">
+                <i class="fas fa-hospital"></i>
+                <span>Kliniki</span>
+            </a>
+            <a href="/settings" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Ustawienia</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Ukryty element z PESEL-em dla JavaScript -->
+        <div id="patient-pesel" style="display: none;">{{ patient.pesel }}</div>
+        
+        <div class="dashboard-header">
+            <div class="dashboard-title">
+                <h1>{{ patient.name }} {{ patient.surname }}</h1>
+                <p>PESEL: {{ patient.pesel }}</p>
+            </div>
+            <div class="user-profile">
+                <i class="fas fa-user-circle fa-2x" style="color: var(--primary-color);"></i>
+                <span>Dr. Anna Kowalska</span>
+                <span class="role">Trycholog</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-navigation">
+            <a href="/new-visit/{{ patient.pesel }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nowa Wizyta
+            </a>
+            <a href="/edit-patient/{{ patient.pesel }}" class="btn btn-secondary">
+                <i class="fas fa-edit"></i> Edytuj
+            </a>
+            <a href="/trichoscopy/{{ patient.pesel }}" class="btn btn-secondary">
+                <i class="fas fa-microscope"></i> Trychoskopia
+            </a>
+            <a href="/care-plan/{{ patient.pesel }}" class="btn btn-secondary">
+                <i class="fas fa-clipboard-list"></i> Plan Pielęgnacyjny
+            </a>
+            <a href="/billing/{{ patient.pesel }}" class="btn btn-warning">
+                <i class="fas fa-receipt"></i> Płatności
+            </a>
+            <button class="btn btn-danger" onclick="confirmDelete('{{ patient.pesel }}')">
+                <i class="fas fa-trash"></i> Usuń
+            </button>
+        </div>
+
+        <div class="form-container">
+            <!-- Lewa kolumna - Dane osobowe i kontaktowe -->
+            <div class="form-column">
+                <div class="form-column-header">
+                    <i class="fas fa-user"></i>
+                    <h2>Dane osobowe</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Imię i Nazwisko</label>
+                    <div class="info-value">{{ patient.name }} {{ patient.surname }}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> PESEL</label>
+                    <div class="info-value">{{ patient.pesel }}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Data urodzenia</label>
+                    <div class="info-value">{{ patient.birth_date if patient.birth_date else 'Brak' }}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-venus-mars"></i> Płeć</label>
+                    <div class="info-value">
+                        {% if patient.gender == 'female' %}
+                            <i class="fas fa-venus"></i> Kobieta
+                        {% elif patient.gender == 'male' %}
+                            <i class="fas fa-mars"></i> Mężczyzna
+                        {% else %}
+                            Brak
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-home"></i> Adres</label>
+                    <div class="info-value">{{ patient.address if patient.address else 'Brak' }}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-briefcase"></i> Zawód</label>
+                    <div class="info-value">{{ patient.occupation if patient.occupation else 'Brak' }}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <div class="info-value">{{ patient.email if patient.email else 'Brak' }}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Telefon</label>
+                    <div class="info-value">{{ patient.phone if patient.phone else 'Brak' }}</div>
+                </div>
+
+                <div class="form-column-header">
+                    <i class="fas fa-chart-line"></i>
+                    <h2>Poziom stresu</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-briefcase"></i> Stres w pracy</label>
+                    <div class="stress-meter">
+                        <div class="stress-level" data-stress-level="{{ patient.work_stress if patient.work_stress else 0 }}"></div>
+                        <span class="stress-value">{{ patient.work_stress if patient.work_stress else 0 }}/10</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-heart"></i> Stres życiowy</label>
+                    <div class="stress-meter">
+                        <div class="stress-level" data-stress-level="{{ patient.life_stress if patient.life_stress else 0 }}"></div>
+                        <span class="stress-value">{{ patient.life_stress if patient.life_stress else 0 }}/10</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Środkowa kolumna - Historia chorobowa i alergie -->
+            <div class="form-column">
+                <div class="form-column-header">
+                    <i class="fas fa-notes-medical"></i>
+                    <h2>Historia chorobowa</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-disease"></i> Choroby przewlekłe</label>
+                    <div class="tag-list">
+                        {% if patient.chronic_diseases %}
+                            {% for disease in patient.chronic_diseases %}
+                                <span class="tag">{{ disease }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="tag tag-empty">Brak</span>
+                        {% endif %}
+                    </div>
+                    {% if patient.chronic_diseases_other %}
+                        <div class="other-details">{{ patient.chronic_diseases_other }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-procedures"></i> Operacje i zabiegi</label>
+                    <div class="info-value">{{ patient.surgeries if patient.surgeries else 'Brak' }}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-notes-medical"></i> Inne schorzenia</label>
+                    <div class="info-value">{{ patient.other_conditions if patient.other_conditions else 'Brak' }}</div>
+                </div>
+
+                <div class="form-column-header">
+                    <i class="fas fa-allergies"></i>
+                    <h2>Alergie</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-exclamation-triangle"></i> Alergie</label>
+                    <div class="tag-list">
+                        {% if patient.allergies %}
+                            {% for allergy in patient.allergies %}
+                                <span class="tag">{{ allergy }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="tag tag-empty">Brak znanych alergii</span>
+                        {% endif %}
+                    </div>
+                    {% if patient.allergies_details %}
+                        <div class="other-details">{{ patient.allergies_details }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-allergies"></i> Reakcje alergiczne</label>
+                    <div class="info-value">{{ patient.allergic_reactions if patient.allergic_reactions else 'Brak' }}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-spray-can"></i> Alergie kosmetyczne</label>
+                    <div class="info-value">{{ patient.cosmetic_allergies if patient.cosmetic_allergies else 'Brak' }}</div>
+                </div>
+
+                <div class="form-column-header">
+                    <i class="fas fa-pills"></i>
+                    <h2>Leki i suplementy</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-pills"></i> Leki</label>
+                    {% if patient.medication_list %}
+                        {% for medication in patient.medication_list %}
+                            <div class="medication-item">
+                                <strong>{{ medication.name }}</strong>
+                                <div>Dawka: {{ medication.dose }}</div>
+                                <div>Schemat: {{ medication.schedule }}</div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="info-value">Brak</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-capsules"></i> Suplementy</label>
+                    {% if patient.supplements_list %}
+                        {% for supplement in patient.supplements_list %}
+                            <div class="supplement-item">
+                                <strong>{{ supplement.name }}</strong>
+                                <div>Dawka: {{ supplement.dose }}</div>
+                                <div>Schemat: {{ supplement.schedule }}</div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="info-value">Brak</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Prawa kolumna - Styl życia i trychoskopia -->
+            <div class="form-column">
+                <div class="form-column-header">
+                    <i class="fas fa-heart"></i>
+                    <h2>Styl życia</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-smoking"></i> Nałogi</label>
+                    <div class="tag-list">
+                        {% if patient.habits %}
+                            {% for habit in patient.habits %}
+                                <span class="tag">{{ habit }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="tag tag-empty">Brak</span>
+                        {% endif %}
+                    </div>
+                    {% if patient.habits_details %}
+                        <div class="other-details">{{ patient.habits_details }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-utensils"></i> Dieta</label>
+                    <div class="tag-list">
+                        {% if patient.diet %}
+                            {% for diet_item in patient.diet %}
+                                <span class="tag">{{ diet_item }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="tag tag-empty">Brak</span>
+                        {% endif %}
+                    </div>
+                    {% if patient.diet_details %}
+                        <div class="other-details">{{ patient.diet_details }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-running"></i> Aktywność fizyczna</label>
+                    <div class="info-value">{{ patient.physical_activity if patient.physical_activity else 'Brak' }}</div>
+                    {% if patient.activity_details %}
+                        <div class="other-details">{{ patient.activity_details }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-bed"></i> Sen</label>
+                    <div class="info-value">
+                        {% if patient.sleep_hours %}
+                            {{ patient.sleep_hours }} godzin/noc
+                        {% else %}
+                            Brak danych
+                        {% endif %}
+                    </div>
+                    {% if patient.sleep_quality %}
+                        <div class="other-details">Jakość snu: {{ patient.sleep_quality }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-column-header">
+                    <i class="fas fa-users"></i>
+                    <h2>Historia rodzinna</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-user-friends"></i> Łysienie w rodzinie</label>
+                    <div class="info-value">{{ patient.family_hair_loss if patient.family_hair_loss else 'Brak' }}</div>
+                    {% if patient.family_hair_loss_details %}
+                        <div class="other-details">{{ patient.family_hair_loss_details }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-dna"></i> Choroby genetyczne</label>
+                    <div class="info-value">{{ patient.family_genetic_diseases if patient.family_genetic_diseases else 'Brak' }}</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-hand-sparkles"></i> Choroby skóry</label>
+                    <div class="info-value">{{ patient.family_skin_diseases if patient.family_skin_diseases else 'Brak' }}</div>
+                </div>
+
+
+                
+                <div class="form-group">
+                    <label><i class="fas fa-notes"></i> Dodatkowe notatki</label>
+                    <div class="info-value">{{ patient.additional_notes if patient.additional_notes else 'Brak' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sekcja galerii trychoskopii - pełna szerokość -->
+        <section class="trichoscopy-section">
+            <div class="trichoscopy-header">
+                <div class="trichoscopy-title">
+                    <i class="fas fa-microscope"></i>
+                    <h2>Historia badań trychoskopii</h2>
+                </div>
+                <div class="trichoscopy-actions">
+                    <button onclick="openAdvancedGallery()" class="btn btn-primary" style="margin-right: 10px;">
+                        <i class="fas fa-images"></i> Pełna galeria
+                    </button>
+                    <a href="/trichoscopy/{{ patient.pesel }}" class="btn btn-primary">
+                        <i class="fas fa-camera"></i> Nowe badanie
+                    </a>
+                </div>
+            </div>
+            
+            <div class="trichoscopy-content">
+                <div id="photoGallery" class="full-width-gallery">
+                    <p>Ładowanie zdjęć trychoskopii...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sekcja planu pielęgnacyjnego - pełna szerokość -->
+        <section class="care-plan-section">
+            <div class="care-plan-header">
+                <div class="care-plan-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h2>Plan pielęgnacyjny</h2>
+                </div>
+                <div class="care-plan-actions">
+                    <a href="/care-plan/{{ patient.pesel }}" class="btn btn-primary">
+                        <i class="fas fa-clipboard-list"></i> Zarządzaj planem
+                    </a>
+                </div>
+            </div>
+            
+            <div class="care-plan-content">
+                <div class="plan-preview">
+                    <div class="plan-summary">
+                        <div class="home-care-summary" onclick="openHomeCareModal()">
+                            <h4><i class="fas fa-home"></i> Plan domowy</h4>
+                            <p id="homeCareStatus">Ładowanie planu domowego...</p>
+                            <div class="click-hint">Kliknij aby wyświetlić pełny plan</div>
+                        </div>
+                        <div class="clinic-care-summary" onclick="openClinicCareModal()">
+                            <h4><i class="fas fa-stethoscope"></i> Plan gabinetowy</h4>
+                            <p id="clinicCareStatus">Ładowanie planu gabinetowego...</p>
+                            <div class="click-hint">Kliknij aby wyświetlić pełny plan</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sekcja historii wizyt - pełna szerokość -->
+        <section class="visits-section">
+            <div class="visits-header">
+                <div class="visits-title">
+                    <i class="fas fa-calendar-check"></i>
+                    <h2>Historia wizyt</h2>
+                </div>
+                <div class="visits-actions">
+                    <a href="/new-visit/{{ patient.pesel }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nowa wizyta
+                    </a>
+                </div>
+            </div>
+            
+            <div class="visits-content">
+                <div id="visitsGallery" class="full-width-visits">
+                    <p>Ładowanie historii wizyt...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal dla planu domowego -->
+    <div id="homeCareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-home"></i> Plan domowy</h2>
+                <span class="close" onclick="closeHomeCareModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="homeCareModalContent">
+                    <div class="loading">Ładowanie planu domowego...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal dla planu gabinetowego -->
+    <div id="clinicCareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-stethoscope"></i> Plan gabinetowy</h2>
+                <span class="close" onclick="closeClinicCareModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="clinicCareModalContent">
+                    <div class="loading">Ładowanie planu gabinetowego...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funkcja do potwierdzenia usunięcia pacjenta
+        function confirmDelete(pesel) {
+            if (confirm("Czy na pewno chcesz usunąć tego pacjenta?")) {
+                // Tutaj kod do usunięcia pacjenta
+                window.location.href = `/api/delete-patient/${pesel}`;
+            }
+        }
+
+        // Inicjalizacja poziomów stresu
+        document.addEventListener('DOMContentLoaded', function() {
+            const stressLevels = document.querySelectorAll('.stress-level');
+            stressLevels.forEach(level => {
+                const stressValue = level.getAttribute('data-stress-level');
+                level.style.width = `${stressValue * 10}%`;
+                
+                // Dodaj kolory w zależności od poziomu stresu
+                if (stressValue <= 3) {
+                    level.style.backgroundColor = '#22c55e'; // zielony
+                } else if (stressValue <= 6) {
+                    level.style.backgroundColor = '#f59e0b'; // żółty
+                } else {
+                    level.style.backgroundColor = '#ef4444'; // czerwony
+                }
+            });
+        });
+
+        // Zmienne globalne
+        let allPhotos = [];
+        let selectedPhotosForComparison = []; // Zdjęcia wybrane do porównania
+        
+        // Funkcja do ładowania zdjęć trychoskopii
+        async function loadTrichoscopyPhotos() {
+            try {
+                const response = await fetch(`/api/get-all-photos/{{ patient.pesel }}`);
+                const data = await response.json();
+                
+                console.log('Otrzymane dane z API:', data);
+                
+                // API zwraca bezpośrednio tablicę zdjęć
+                if (Array.isArray(data)) {
+                    // Mapuj pola na oczekiwany format
+                    allPhotos = data.map(photo => ({
+                        id: photo.id,
+                        url: photo.photo_url,
+                        date: photo.created_at,
+                        head_region: photo.head_region,
+                        note: photo.note,
+                        photo_type: photo.photo_type
+                    }));
+                    
+                    renderSimpleGallery();
+                } else {
+                    console.error('Nieprawidłowy format danych z API:', data);
+                }
+            } catch (error) {
+                console.error('Błąd podczas ładowania zdjęć:', error);
+            }
+        }
+
+        // Funkcja do renderowania galerii pełnej szerokości
+        function renderSimpleGallery() {
+            const gallery = document.getElementById('photoGallery');
+            if (!gallery) {
+                console.error('Nie znaleziono elementu photoGallery');
+                return;
+            }
+            
+            gallery.innerHTML = '';
+            
+            if (allPhotos.length === 0) {
+                gallery.innerHTML = '<div class="no-photos">Brak zdjęć dla tego pacjenta</div>';
+                return;
+            }
+            
+            allPhotos.forEach(photo => {
+                const photoElement = document.createElement('div');
+                photoElement.className = 'gallery-photo-item';
+                const photoTypeLabel = photo.photo_type === 'clinical' ? 'Obraz kliniczny' : 'Trychoskopia';
+                const photoTypeClass = photo.photo_type === 'clinical' ? 'clinical-photo' : 'trichoscopy-photo';
+                
+                photoElement.innerHTML = `
+                    <div class="photo-container ${photoTypeClass}">
+                        <img src="${photo.url}" alt="${photoTypeLabel}" onclick="openPhotoModal('${photo.url}')">
+                        <div class="photo-type-badge">${photoTypeLabel}</div>
+                        <div class="photo-overlay">
+                            <button class="delete-btn" onclick="deletePhoto('${photo.id}', '${photo.photo_type}')" title="Usuń zdjęcie">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="photo-info">
+                        <div class="photo-date">${new Date(photo.date).toLocaleDateString()}</div>
+                        <div class="photo-region">${photo.head_region}</div>
+                        ${photo.note ? `<div class="photo-note">${photo.note}</div>` : ''}
+                    </div>
+                `;
+                gallery.appendChild(photoElement);
+            });
+        }
+
+        // Funkcja do usuwania zdjęcia
+        async function deletePhoto(photoId, photoType) {
+            if (confirm('Czy na pewno chcesz usunąć to zdjęcie?')) {
+                try {
+                    let endpoint;
+                    if (photoType === 'clinical') {
+                        endpoint = `/api/delete-clinical-photo/{{ patient.pesel }}/${photoId}`;
+                    } else {
+                        endpoint = `/api/delete-trichoscopy-photo/{{ patient.pesel }}/${photoId}`;
+                    }
+                    
+                    const response = await fetch(endpoint, {
+                        method: 'DELETE'
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        loadTrichoscopyPhotos();
+                    } else {
+                        alert('Wystąpił błąd podczas usuwania zdjęcia.');
+                    }
+                } catch (error) {
+                    console.error('Błąd podczas usuwania zdjęcia:', error);
+                    alert('Wystąpił błąd podczas usuwania zdjęcia.');
+                }
+            }
+        }
+
+        // Funkcja do otwierania zdjęcia w modal
+        function openPhotoModal(photoUrl) {
+            const photoIndex = allPhotos.findIndex(photo => photo.url === photoUrl);
+            openFullGallery(photoIndex);
+        }
+        
+        // Funkcja do otwierania zaawansowanej galerii z porównaniem
+        function openAdvancedGallery() {
+            if (allPhotos.length === 0) {
+                alert('Brak zdjęć do wyświetlenia');
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'advanced-gallery-modal';
+            modal.id = 'advancedGalleryModal';
+            
+            modal.innerHTML = `
+                <div class="advanced-gallery-content">
+                    <div class="advanced-gallery-header">
+                        <h2><i class="fas fa-images"></i> Galeria zdjęć trychoskopowych</h2>
+                        <div class="advanced-gallery-controls">
+                            <!-- Filtry -->
+                            <select id="advancedPhotoFilter" class="filter-select">
+                                <option value="all">Wszystkie zdjęcia</option>
+                                <option value="today">Dzisiaj</option>
+                                <option value="week">Ostatni tydzień</option>
+                                <option value="month">Ostatni miesiąc</option>
+                            </select>
+                            
+                            <!-- Sortowanie -->
+                            <select id="advancedSortBy" class="sort-select">
+                                <option value="newest">Najnowsze</option>
+                                <option value="oldest">Najstarsze</option>
+                                <option value="region">Według regionu A-Z</option>
+                                <option value="region-desc">Według regionu Z-A</option>
+                            </select>
+                            
+                            <!-- Panel porównywania -->
+                            <div id="advancedComparisonPanel" style="
+                                display: none;
+                                background: rgba(255,255,255,0.95);
+                                border: 2px solid #2196F3;
+                                border-radius: 8px;
+                                padding: 12px;
+                                margin: 0 15px;
+                                flex-grow: 1;
+                                max-width: 300px;
+                            ">
+                                <div style="
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    margin-bottom: 8px;
+                                ">
+                                    <i class="fas fa-balance-scale" style="color: #2196F3;"></i>
+                                    <span style="font-weight: 600; color: #333;">Porównywanie (<span id="advancedComparisonCount">0</span>/2)</span>
+                                    <button onclick="clearAdvancedComparison()" style="
+                                        background: #f44336;
+                                        color: white;
+                                        border: none;
+                                        padding: 4px 8px;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                        font-size: 11px;
+                                        margin-left: auto;
+                                    ">×</button>
+                                </div>
+                                <div id="advancedSelectedPhotos" style="
+                                    display: flex;
+                                    gap: 8px;
+                                    margin-bottom: 8px;
+                                "></div>
+                                <div id="advancedComparisonActions" style="
+                                    display: flex;
+                                    gap: 8px;
+                                    justify-content: center;
+                                "></div>
+                            </div>
+                            
+                            <!-- Zamknij -->
+                            <button class="close-advanced-gallery" onclick="closeAdvancedGallery()">
+                                <i class="fas fa-times"></i> Zamknij
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-gallery-main">
+                        <div id="advancedPhotoGrid" class="advanced-photo-grid">
+                            <!-- Zdjęcia będą dodawane tutaj -->
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Zapobiegaj przewijaniu strony
+            document.body.style.overflow = 'hidden';
+            
+            // Renderuj zdjęcia
+            renderAdvancedGallery();
+            
+            // Obsługa filtrów
+            document.getElementById('advancedPhotoFilter').addEventListener('change', renderAdvancedGallery);
+            document.getElementById('advancedSortBy').addEventListener('change', renderAdvancedGallery);
+            
+            // Zamknij galerię po kliknięciu w tło
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeAdvancedGallery();
+                }
+            });
+        }
+
+        // Funkcja do otwierania pełnej galerii
+        function openFullGallery(startIndex = 0) {
+            if (allPhotos.length === 0) {
+                alert('Brak zdjęć do wyświetlenia');
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.className = 'full-gallery-modal';
+            modal.id = 'fullGalleryModal';
+            
+            const currentPhoto = allPhotos[startIndex];
+            
+            modal.innerHTML = `
+                <div class="full-gallery-content">
+                    <div class="gallery-header">
+                        <div class="gallery-counter">
+                            <span id="currentPhotoIndex">${startIndex + 1}</span> / ${allPhotos.length}
+                        </div>
+                        <div class="gallery-controls">
+                            <button class="gallery-btn" onclick="toggleFullscreen()" title="Pełny ekran">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="gallery-btn" onclick="closeFullGallery()" title="Zamknij">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="gallery-main">
+                        <button class="gallery-nav prev" onclick="previousPhoto()" title="Poprzednie zdjęcie">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <div class="gallery-photo-container">
+                            <img id="galleryMainImage" src="${currentPhoto.url}" alt="Trychoskopia">
+                            <div class="gallery-photo-info">
+                                <div class="photo-meta">
+                                    <div class="photo-region">${currentPhoto.head_region}</div>
+                                    <div class="photo-date">${new Date(currentPhoto.date).toLocaleDateString('pl-PL', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}</div>
+                                </div>
+                                ${currentPhoto.note ? `<div class="photo-note">${currentPhoto.note}</div>` : ''}
+                            </div>
+                        </div>
+                        
+                        <button class="gallery-nav next" onclick="nextPhoto()" title="Następne zdjęcie">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="gallery-thumbnails">
+                        ${allPhotos.map((photo, index) => `
+                            <div class="thumbnail ${index === startIndex ? 'active' : ''}" 
+                                 onclick="showPhoto(${index})">
+                                <img src="${photo.url}" alt="Miniatura">
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Obsługa klawiszy
+            document.addEventListener('keydown', handleGalleryKeyboard);
+            
+            // Zapobiegaj przewijaniu strony
+            document.body.style.overflow = 'hidden';
+            
+            // Ustaw aktualny indeks
+            window.currentGalleryIndex = startIndex;
+            
+            // Zamknij galerię po kliknięciu w tło
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeFullGallery();
+                }
+            });
+            
+            // Obsługa zoom za pomocą kółka myszy
+            modal.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                const image = document.getElementById('galleryMainImage');
+                let scale = parseFloat(image.style.transform.replace('scale(', '').replace(')', '')) || 1;
+                
+                if (e.deltaY < 0) {
+                    // Scroll w górę - powiększ
+                    scale = Math.min(scale + 0.1, 3);
+                } else {
+                    // Scroll w dół - pomniejsz
+                    scale = Math.max(scale - 0.1, 0.5);
+                }
+                
+                image.style.transform = `scale(${scale})`;
+            });
+        }
+
+        // Funkcja do zamknięcia pełnej galerii
+        function closeFullGallery() {
+            const modal = document.getElementById('fullGalleryModal');
+            if (modal) {
+                modal.remove();
+                document.removeEventListener('keydown', handleGalleryKeyboard);
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Funkcja do pokazania konkretnego zdjęcia
+        function showPhoto(index) {
+            if (index < 0 || index >= allPhotos.length) return;
+            
+            window.currentGalleryIndex = index;
+            const photo = allPhotos[index];
+            
+            // Aktualizuj główne zdjęcie
+            const mainImage = document.getElementById('galleryMainImage');
+            const counter = document.getElementById('currentPhotoIndex');
+            
+            mainImage.src = photo.url;
+            mainImage.style.transform = 'scale(1)'; // Reset zoom
+            counter.textContent = index + 1;
+            
+            // Aktualizuj informacje o zdjęciu
+            const photoInfo = document.querySelector('.gallery-photo-info');
+            photoInfo.innerHTML = `
+                <div class="photo-meta">
+                    <div class="photo-region">${photo.head_region}</div>
+                    <div class="photo-date">${new Date(photo.date).toLocaleDateString('pl-PL', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })}</div>
+                </div>
+                ${photo.note ? `<div class="photo-note">${photo.note}</div>` : ''}
+            `;
+            
+            // Aktualizuj aktywną miniaturę
+            document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
+        }
+
+        // Funkcja do przejścia do następnego zdjęcia
+        function nextPhoto() {
+            const nextIndex = (window.currentGalleryIndex + 1) % allPhotos.length;
+            showPhoto(nextIndex);
+        }
+
+        // Funkcja do przejścia do poprzedniego zdjęcia
+        function previousPhoto() {
+            const prevIndex = (window.currentGalleryIndex - 1 + allPhotos.length) % allPhotos.length;
+            showPhoto(prevIndex);
+        }
+
+        // Funkcja do przełączania pełnego ekranu
+        function toggleFullscreen() {
+            const modal = document.getElementById('fullGalleryModal');
+            if (!document.fullscreenElement) {
+                modal.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Obsługa klawiszy w galerii
+        function handleGalleryKeyboard(e) {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    previousPhoto();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    nextPhoto();
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    closeFullGallery();
+                    break;
+                case 'f':
+                case 'F':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+            }
+        }
+
+        // Funkcja do ładowania historii wizyt
+        async function loadVisitsHistory() {
+            try {
+                const response = await fetch(`/api/get-patient-visits/{{ patient.pesel }}`);
+                const data = await response.json();
+                
+                console.log('Otrzymane wizyty z API:', data);
+                
+                renderVisitsGallery(data);
+            } catch (error) {
+                console.error('Błąd podczas ładowania wizyt:', error);
+                const gallery = document.getElementById('visitsGallery');
+                if (gallery) {
+                    gallery.innerHTML = '<div class="no-photos">Błąd podczas ładowania wizyt</div>';
+                }
+            }
+        }
+
+        // Funkcja do renderowania galerii wizyt
+        function renderVisitsGallery(visits) {
+            const gallery = document.getElementById('visitsGallery');
+            if (!gallery) {
+                console.error('Nie znaleziono elementu visitsGallery');
+                return;
+            }
+            
+            gallery.innerHTML = '';
+            
+            if (!visits || visits.length === 0) {
+                gallery.innerHTML = '<div class="no-photos">Brak wizyt dla tego pacjenta</div>';
+                return;
+            }
+            
+            visits.forEach(visit => {
+                const visitElement = document.createElement('div');
+                visitElement.className = 'visit-item';
+                visitElement.innerHTML = `
+                    <div class="visit-info">
+                        <div class="visit-date">${new Date(visit.date).toLocaleDateString()}</div>
+                        <div class="visit-type">${visit.type || 'Wizyta kontrolna'}</div>
+                        <div class="visit-doctor">${visit.doctor || 'Dr House'}</div>
+                        ${visit.notes ? `<div class="visit-notes">${visit.notes}</div>` : ''}
+                        <div class="visit-actions">
+                            <button class="btn btn-sm" onclick="viewVisit('${visit.id}')">Szczegóły</button>
+                            <button class="btn btn-sm btn-secondary" onclick="editVisit('${visit.id}')">Edytuj</button>
+                        </div>
+                    </div>
+                `;
+                gallery.appendChild(visitElement);
+            });
+        }
+
+        // Funkcje do obsługi wizyt
+        function viewVisit(visitId) {
+            window.location.href = `/visit/${visitId}`;
+        }
+
+        function editVisit(visitId) {
+            const pesel = document.getElementById('patient-pesel').textContent;
+            window.location.href = `/edit-visit/${pesel}/${visitId}`;
+        }
+
+        // Funkcja do ładowania podglądu planu domowego
+        async function loadHomeCarePreview() {
+            try {
+                const response = await fetch(`/api/get-home-care-plan/{{ patient.pesel }}`);
+                const data = await response.json();
+                
+                const statusElement = document.getElementById('homeCareStatus');
+                if (data.plan && data.plan.items && data.plan.items.length > 0) {
+                    const items = data.plan.items;
+                    const today = new Date().getDay(); // 0 = niedziela, 1 = poniedziałek, etc.
+                    
+                    // Konwertuj dzień tygodnia na format używany w planie
+                    const todayItems = items.filter(item => item.day_of_week == today);
+                    const totalItems = items.length;
+                    const uniqueDays = new Set(items.map(item => item.day_of_week)).size;
+                    
+                    // Grupuj produkty według typu
+                    const productTypes = {};
+                    items.forEach(item => {
+                        if (!productTypes[item.product_type]) {
+                            productTypes[item.product_type] = 0;
+                        }
+                        productTypes[item.product_type]++;
+                    });
+                    
+                    const productTypesText = Object.entries(productTypes)
+                        .map(([type, count]) => `${count} ${type}`)
+                        .join(', ');
+                    
+                    statusElement.innerHTML = `
+                        <div style="margin-bottom: 8px;">
+                            <strong style="color: #2c3e50;">📅 Dzisiaj:</strong> 
+                            <span style="color: ${todayItems.length > 0 ? '#27ae60' : '#e67e22'};">
+                                ${todayItems.length > 0 ? `${todayItems.length} produktów` : 'Brak produktów'}
+                            </span>
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <strong style="color: #2c3e50;">📊 Łącznie:</strong> 
+                            <span style="color: #7f8c8d;">${totalItems} produktów na ${uniqueDays} dni</span>
+                        </div>
+                        <div style="font-size: 12px; color: #95a5a6;">
+                            ${productTypesText}
+                        </div>
+                    `;
+                } else {
+                    statusElement.innerHTML = `
+                        <div style="color: #e74c3c; font-weight: 500;">
+                            <i class="fas fa-exclamation-circle"></i> 
+                            Brak planu domowego
+                        </div>
+                        <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                            Kliknij "Zarządzaj planem" aby utworzyć
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Błąd podczas ładowania planu domowego:', error);
+                const statusElement = document.getElementById('homeCareStatus');
+                statusElement.innerHTML = `
+                    <div style="color: #e74c3c;">
+                        <i class="fas fa-times-circle"></i> 
+                        Błąd podczas ładowania planu
+                    </div>
+                `;
+            }
+        }
+
+        // Funkcja do ładowania podglądu planu gabinetowego
+        async function loadClinicCarePreview() {
+            try {
+                const response = await fetch(`/api/get-clinic-treatment-plan/{{ patient.pesel }}`);
+                const data = await response.json();
+                
+                const statusElement = document.getElementById('clinicCareStatus');
+                if (data.plan && data.plan.treatments && data.plan.treatments.length > 0) {
+                    const treatments = data.plan.treatments;
+                    const todoCount = treatments.filter(t => t.status === 'todo').length;
+                    const inProgressCount = treatments.filter(t => t.status === 'in_progress').length;
+                    const doneCount = treatments.filter(t => t.status === 'done').length;
+                    const totalCount = treatments.length;
+                    
+                    // Oblicz procent ukończenia
+                    const completionPercentage = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+                    
+                    // Grupuj zabiegi według typu
+                    const treatmentTypes = {};
+                    treatments.forEach(treatment => {
+                        const type = treatment.treatment_type || 'Inne';
+                        if (!treatmentTypes[type]) {
+                            treatmentTypes[type] = 0;
+                        }
+                        treatmentTypes[type]++;
+                    });
+                    
+                    const treatmentTypesText = Object.entries(treatmentTypes)
+                        .map(([type, count]) => `${count} ${type}`)
+                        .join(', ');
+                    
+                    statusElement.innerHTML = `
+                        <div style="margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong style="color: #2c3e50;">📈 Postęp:</strong>
+                                <span style="color: #2c3e50; font-weight: 600;">${completionPercentage}%</span>
+                            </div>
+                            <div style="background: #ecf0f1; border-radius: 10px; height: 8px; overflow: hidden;">
+                                <div style="background: linear-gradient(90deg, #26de81 0%, #2ecc71 100%); height: 100%; width: ${completionPercentage}%; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; font-size: 12px;">
+                            <div style="text-align: center; padding: 6px; background: rgba(255, 193, 7, 0.1); border-radius: 4px; color: #f39c12;">
+                                <div style="font-weight: 600;">${todoCount}</div>
+                                <div>Do zrobienia</div>
+                            </div>
+                            <div style="text-align: center; padding: 6px; background: rgba(52, 152, 219, 0.1); border-radius: 4px; color: #3498db;">
+                                <div style="font-weight: 600;">${inProgressCount}</div>
+                                <div>W trakcie</div>
+                            </div>
+                            <div style="text-align: center; padding: 6px; background: rgba(46, 204, 113, 0.1); border-radius: 4px; color: #27ae60;">
+                                <div style="font-weight: 600;">${doneCount}</div>
+                                <div>Wykonane</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #95a5a6;">
+                            ${treatmentTypesText}
+                        </div>
+                    `;
+                } else {
+                    statusElement.innerHTML = `
+                        <div style="color: #e74c3c; font-weight: 500;">
+                            <i class="fas fa-exclamation-circle"></i> 
+                            Brak planu zabiegów
+                        </div>
+                        <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                            Kliknij "Zarządzaj planem" aby utworzyć
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Błąd podczas ładowania planu gabinetowego:', error);
+                const statusElement = document.getElementById('clinicCareStatus');
+                statusElement.innerHTML = `
+                    <div style="color: #e74c3c;">
+                        <i class="fas fa-times-circle"></i> 
+                        Błąd podczas ładowania planu
+                    </div>
+                `;
+            }
+        }
+
+        // Event listenery
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Strona pacjenta załadowana, rozpoczynam ładowanie danych...');
+            // Załaduj wszystkie dane
+            loadTrichoscopyPhotos();
+            loadVisitsHistory();
+            loadHomeCarePreview();
+            loadClinicCarePreview();
+        });
+
+        // Załaduj dane przy starcie
+        loadTrichoscopyPhotos();
+        loadVisitsHistory();
+        loadHomeCarePreview();
+        loadClinicCarePreview();
+
+        // Funkcje obsługi modali planów
+        function openHomeCareModal() {
+            document.getElementById('homeCareModal').style.display = 'block';
+            loadFullHomeCare();
+        }
+
+        function closeHomeCareModal() {
+            document.getElementById('homeCareModal').style.display = 'none';
+        }
+
+        function openClinicCareModal() {
+            document.getElementById('clinicCareModal').style.display = 'block';
+            loadFullClinicCare();
+        }
+
+        function closeClinicCareModal() {
+            document.getElementById('clinicCareModal').style.display = 'none';
+        }
+
+        // Zamknij modal przy kliknięciu poza nim
+        window.onclick = function(event) {
+            const homeCareModal = document.getElementById('homeCareModal');
+            const clinicCareModal = document.getElementById('clinicCareModal');
+            if (event.target === homeCareModal) {
+                closeHomeCareModal();
+            }
+            if (event.target === clinicCareModal) {
+                closeClinicCareModal();
+            }
+        }
+
+        // Funkcja do ładowania pełnego planu domowego
+        async function loadFullHomeCare() {
+            try {
+                const response = await fetch(`/api/get-home-care-plan/{{ patient.pesel }}`);
+                const data = await response.json();
+                
+                const modalContent = document.getElementById('homeCareModalContent');
+                
+                if (data.plan && data.plan.items && data.plan.items.length > 0) {
+                    const items = data.plan.items;
+                    const today = new Date().getDay();
+                    
+                    // Grupuj produkty według dnia tygodnia
+                    const dayNames = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
+                    const daysOfWeek = {};
+                    
+                    items.forEach(item => {
+                        const dayIndex = parseInt(item.day_of_week);
+                        if (!daysOfWeek[dayIndex]) {
+                            daysOfWeek[dayIndex] = [];
+                        }
+                        daysOfWeek[dayIndex].push(item);
+                    });
+                    
+                    let html = '<div class="home-care-calendar">';
+                    
+                    // Pokaż wszystkie dni tygodnia
+                    for (let i = 0; i < 7; i++) {
+                        const dayItems = daysOfWeek[i] || [];
+                        const isToday = i === today;
+                        
+                        html += `
+                            <div class="calendar-day ${isToday ? 'today' : ''}">
+                                <div class="day-header">
+                                    <h3>${dayNames[i]}</h3>
+                                    ${isToday ? '<span class="today-badge">Dzisiaj</span>' : ''}
+                                </div>
+                                <div class="day-products">
+                        `;
+                        
+                        if (dayItems.length > 0) {
+                            dayItems.forEach(item => {
+                                html += `
+                                    <div class="product-item">
+                                        <div class="product-main">
+                                            <span class="product-type">${item.product_type || 'Produkt'}</span>
+                                            <span class="product-name">${item.product_name || 'Bez nazwy'}</span>
+                                        </div>
+                                        <div class="product-details">
+                                            <div class="product-dose">
+                                                <i class="fas fa-clock"></i> ${item.time_of_day || 'Brak czasu'}
+                                            </div>
+                                            <div class="product-frequency">
+                                                <i class="fas fa-repeat"></i> ${item.frequency || 'Brak częstotliwości'}
+                                            </div>
+                                        </div>
+                                        ${item.instructions ? `<div class="product-instructions"><i class="fas fa-info-circle"></i> ${item.instructions}</div>` : ''}
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            html += '<div class="no-products">Brak produktów</div>';
+                        }
+                        
+                        html += '</div></div>';
+                    }
+                    
+                    html += '</div>';
+                    modalContent.innerHTML = html;
+                } else {
+                    modalContent.innerHTML = `
+                        <div class="no-plan">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>Brak planu domowego</h3>
+                            <p>Nie został jeszcze utworzony plan domowy dla tego pacjenta.</p>
+                            <a href="/care-plan/{{ patient.pesel }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Utwórz plan
+                            </a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Błąd podczas ładowania pełnego planu domowego:', error);
+                document.getElementById('homeCareModalContent').innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-times-circle"></i>
+                        <h3>Błąd ładowania</h3>
+                        <p>Nie udało się załadować planu domowego.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Funkcja do ładowania pełnego planu gabinetowego
+        async function loadFullClinicCare() {
+            try {
+                const response = await fetch(`/api/get-clinic-treatment-plan/{{ patient.pesel }}`);
+                const data = await response.json();
+                
+                const modalContent = document.getElementById('clinicCareModalContent');
+                
+                if (data.plan && data.plan.treatments && data.plan.treatments.length > 0) {
+                    const treatments = data.plan.treatments;
+                    
+                    // Grupuj zabiegi według statusu
+                    const statusGroups = {
+                        'todo': { name: 'Do zrobienia', items: [], color: '#f39c12' },
+                        'in_progress': { name: 'W trakcie', items: [], color: '#3498db' },
+                        'done': { name: 'Wykonane', items: [], color: '#27ae60' }
+                    };
+                    
+                    treatments.forEach(treatment => {
+                        const status = treatment.status || 'todo';
+                        if (statusGroups[status]) {
+                            statusGroups[status].items.push(treatment);
+                        }
+                    });
+                    
+                    let html = '<div class="clinic-care-board">';
+                    
+                    Object.entries(statusGroups).forEach(([status, group]) => {
+                        html += `
+                            <div class="status-column">
+                                <div class="status-header" style="background-color: ${group.color};">
+                                    <h3>${group.name}</h3>
+                                    <span class="status-count">${group.items.length}</span>
+                                </div>
+                                <div class="treatments-list">
+                        `;
+                        
+                        if (group.items.length > 0) {
+                            group.items.forEach(treatment => {
+                                // Formatuj historię
+                                let historyHtml = '';
+                                if (treatment.history && treatment.history.length > 0) {
+                                    const recentHistory = treatment.history.slice(-2);
+                                    historyHtml = '<div class="treatment-history">';
+                                    recentHistory.forEach(entry => {
+                                        const date = entry.date_formatted || new Date(entry.timestamp).toLocaleDateString('pl-PL');
+                                        historyHtml += `<div class="history-entry">${entry.from_status} → ${entry.to_status} (${date})</div>`;
+                                    });
+                                    historyHtml += '</div>';
+                                }
+                                
+                                html += `
+                                    <div class="treatment-item">
+                                        <div class="treatment-main">
+                                            <span class="treatment-type">${treatment.treatment_type || 'Zabieg'}</span>
+                                            <span class="treatment-name">${treatment.treatment_name || 'Bez nazwy'}</span>
+                                        </div>
+                                        <div class="treatment-details">
+                                            <div class="treatment-duration">
+                                                <i class="fas fa-hashtag"></i> Ilość: ${treatment.quantity || 1} (wykonano: ${treatment.completed_count || 0})
+                                            </div>
+                                            ${treatment.notes ? `<div class="treatment-description">${treatment.notes}</div>` : ''}
+                                        </div>
+                                        ${historyHtml}
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            html += '<div class="no-treatments">Brak zabiegów</div>';
+                        }
+                        
+                        html += '</div></div>';
+                    });
+                    
+                    html += '</div>';
+                    modalContent.innerHTML = html;
+                } else {
+                    modalContent.innerHTML = `
+                        <div class="no-plan">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>Brak planu gabinetowego</h3>
+                            <p>Nie został jeszcze utworzony plan zabiegów dla tego pacjenta.</p>
+                            <a href="/care-plan/{{ patient.pesel }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Utwórz plan
+                            </a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Błąd podczas ładowania pełnego planu gabinetowego:', error);
+                document.getElementById('clinicCareModalContent').innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-times-circle"></i>
+                        <h3>Błąd ładowania</h3>
+                        <p>Nie udało się załadować planu gabinetowego.</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+
+    <style>
+        /* Dodatkowe style specyficzne dla tej strony */
+        .form-container {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+
+        .form-column {
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+
+        .form-group {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+
+        .photo-gallery {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+
+        .main-content {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+
+        body {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            margin-bottom: 50px;
+        }
+
+        html {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+
+                 /* Style dla sekcji trychoskopii, planu pielęgnacyjnego i wizyt */
+        .trichoscopy-section, .care-plan-section, .visits-section {
+            margin-top: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .visits-section {
+            margin-bottom: 40px;
+        }
+
+        .trichoscopy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+        }
+
+        .care-plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+            color: white;
+        }
+
+        .visits-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+        }
+
+        .trichoscopy-title, .care-plan-title, .visits-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trichoscopy-title i, .care-plan-title i, .visits-title i {
+            font-size: 1.2em;
+        }
+
+        .trichoscopy-title h2, .care-plan-title h2, .visits-title h2 {
+            margin: 0;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .trichoscopy-actions .btn, .care-plan-actions .btn, .visits-actions .btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            padding: 6px 12px;
+            font-size: 0.85em;
+            text-decoration: none;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .trichoscopy-actions .btn:hover, .care-plan-actions .btn:hover, .visits-actions .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+
+        .trichoscopy-content, .care-plan-content, .visits-content {
+            padding: 25px;
+        }
+
+        /* Style dla podglądu planu pielęgnacyjnego */
+        .plan-preview {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .plan-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .home-care-summary, .clinic-care-summary {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e8eaed;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .home-care-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #e67e22 0%, #f39c12 100%);
+        }
+
+        .clinic-care-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .home-care-summary:hover, .clinic-care-summary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+        .home-care-summary h4, .clinic-care-summary h4 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .home-care-summary h4 i {
+            color: #e67e22;
+            font-size: 18px;
+        }
+
+        .clinic-care-summary h4 i {
+            color: #3498db;
+            font-size: 18px;
+        }
+
+        .home-care-summary p, .clinic-care-summary p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .click-hint {
+            margin-top: 10px;
+            padding: 6px 12px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 4px;
+            font-size: 11px;
+            color: #3498db;
+            text-align: center;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .home-care-summary, .clinic-care-summary {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .home-care-summary:hover .click-hint, .clinic-care-summary:hover .click-hint {
+            background: rgba(52, 152, 219, 0.2);
+            color: #2980b9;
+        }
+
+        /* Style dla modali */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border: none;
+            width: 90%;
+            max-width: 1200px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.4em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header h2 i {
+            font-size: 1.2em;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        /* Style dla kalendarza planu domowego */
+        .home-care-calendar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .calendar-day {
+            background: white;
+            border: 2px solid #e8eaed;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .calendar-day.today {
+            border-color: #3498db;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.2);
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calendar-day.today .day-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .day-header h3 {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .today-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 500;
+        }
+
+        .day-products {
+            padding: 20px;
+        }
+
+        .product-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #e67e22;
+            transition: all 0.3s ease;
+        }
+
+        .product-item:hover {
+            background: #e9ecef;
+            transform: translateX(3px);
+        }
+
+        .product-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .product-main {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .product-type {
+            font-size: 0.85em;
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .product-name {
+            font-size: 1em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .product-details {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .product-dose, .product-frequency {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .product-dose i, .product-frequency i {
+            font-size: 0.8em;
+            color: #adb5bd;
+        }
+
+        .product-instructions {
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #2c3e50;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .product-instructions i {
+            color: #3498db;
+            margin-top: 2px;
+        }
+
+        .no-products {
+            text-align: center;
+            color: #adb5bd;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        /* Style dla kanban board planu gabinetowego */
+        .clinic-care-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .status-column {
+            background: #f8f9fa;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-header {
+            padding: 15px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .status-header h3 {
+            margin: 0;
+            font-size: 1.1em;
+        }
+
+        .status-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+        }
+
+        .treatments-list {
+            padding: 20px;
+        }
+
+        .treatment-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .treatment-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .treatment-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .treatment-main {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .treatment-type {
+            font-size: 0.85em;
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .treatment-name {
+            font-size: 1em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .treatment-details {
+            margin-bottom: 10px;
+        }
+
+        .treatment-duration {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .treatment-duration i {
+            font-size: 0.8em;
+            color: #adb5bd;
+        }
+
+        .treatment-description {
+            font-size: 0.9em;
+            color: #495057;
+            line-height: 1.4;
+        }
+
+        .treatment-history {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .history-entry {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-bottom: 3px;
+        }
+
+        .history-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .no-treatments {
+            text-align: center;
+            color: #adb5bd;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        /* Style dla stanów pustych i błędów */
+        .no-plan, .error {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .no-plan i, .error i {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+
+        .error i {
+            color: #dc3545;
+        }
+
+        .no-plan h3, .error h3 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+
+        .no-plan p, .error p {
+            margin: 0 0 20px 0;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Responsywność */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 10px auto;
+            }
+            
+            .modal-header {
+                padding: 15px 20px;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+            
+            .home-care-calendar,
+            .clinic-care-board {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Style dla galerii pełnej szerokości */
+        .full-width-gallery, .full-width-visits {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .gallery-photo-item, .visit-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+            transition: all 0.3s ease;
+            border: 1px solid #e1e8ed;
+        }
+
+        .gallery-photo-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .gallery-photo-item .photo-container {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .gallery-photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-photo-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .photo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-photo-item:hover .photo-overlay {
+            opacity: 1;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+        .gallery-photo-item .photo-info {
+            padding: 15px;
+            background: #fafbfc;
+        }
+
+        .gallery-photo-item .photo-date {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .gallery-photo-item .photo-region {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .gallery-photo-item .photo-note {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .no-photos {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 60px 30px;
+            font-style: italic;
+            font-size: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+
+                 /* Style dla pełnej galerii */
+         .full-gallery-modal {
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background: rgba(0,0,0,0.95);
+             z-index: 10000;
+             display: flex;
+             flex-direction: column;
+         }
+
+         .full-gallery-content {
+             display: flex;
+             flex-direction: column;
+             height: 100%;
+         }
+
+         .gallery-header {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             padding: 15px 20px;
+             background: rgba(0,0,0,0.8);
+             color: white;
+             backdrop-filter: blur(10px);
+         }
+
+         .gallery-counter {
+             font-size: 16px;
+             font-weight: 600;
+         }
+
+         .gallery-controls {
+             display: flex;
+             gap: 10px;
+         }
+
+         .gallery-btn {
+             background: rgba(255,255,255,0.1);
+             color: white;
+             border: 1px solid rgba(255,255,255,0.3);
+             padding: 8px 12px;
+             border-radius: 6px;
+             cursor: pointer;
+             transition: all 0.3s ease;
+         }
+
+         .gallery-btn:hover {
+             background: rgba(255,255,255,0.2);
+             transform: translateY(-1px);
+         }
+
+         .gallery-main {
+             flex: 1;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             position: relative;
+             padding: 20px;
+         }
+
+         .gallery-photo-container {
+             max-width: 90%;
+             max-height: 90%;
+             position: relative;
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+         }
+
+         .gallery-photo-container img {
+             max-width: 100%;
+             max-height: 70vh;
+             object-fit: contain;
+             border-radius: 8px;
+             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+         }
+
+         .gallery-photo-info {
+             background: rgba(0,0,0,0.7);
+             color: white;
+             padding: 15px 20px;
+             border-radius: 8px;
+             margin-top: 15px;
+             text-align: center;
+             backdrop-filter: blur(10px);
+         }
+
+         .photo-meta {
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             gap: 20px;
+             margin-bottom: 10px;
+         }
+
+         .photo-meta .photo-region {
+             font-size: 16px;
+             font-weight: 600;
+             color: #4a90e2;
+         }
+
+         .photo-meta .photo-date {
+             font-size: 14px;
+             color: #ccc;
+         }
+
+         .gallery-photo-info .photo-note {
+             font-size: 13px;
+             color: #ddd;
+             font-style: italic;
+             margin-top: 5px;
+         }
+
+         .gallery-nav {
+             position: absolute;
+             top: 50%;
+             transform: translateY(-50%);
+             background: rgba(0,0,0,0.5);
+             color: white;
+             border: none;
+             width: 50px;
+             height: 50px;
+             border-radius: 50%;
+             cursor: pointer;
+             transition: all 0.3s ease;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 20px;
+             backdrop-filter: blur(10px);
+         }
+
+         .gallery-nav:hover {
+             background: rgba(0,0,0,0.8);
+             transform: translateY(-50%) scale(1.1);
+         }
+
+         .gallery-nav.prev {
+             left: 20px;
+         }
+
+         .gallery-nav.next {
+             right: 20px;
+         }
+
+         .gallery-thumbnails {
+             display: flex;
+             gap: 10px;
+             padding: 15px 20px;
+             background: rgba(0,0,0,0.8);
+             overflow-x: auto;
+             justify-content: center;
+             backdrop-filter: blur(10px);
+         }
+
+         .thumbnail {
+             width: 80px;
+             height: 80px;
+             border-radius: 6px;
+             overflow: hidden;
+             cursor: pointer;
+             transition: all 0.3s ease;
+             border: 2px solid transparent;
+             flex-shrink: 0;
+         }
+
+         .thumbnail.active {
+             border-color: #4a90e2;
+             transform: scale(1.1);
+         }
+
+         .thumbnail:hover {
+             transform: scale(1.05);
+         }
+
+         .thumbnail img {
+             width: 100%;
+             height: 100%;
+             object-fit: cover;
+         }
+
+         /* Responsywność dla galerii */
+         @media (max-width: 768px) {
+             .gallery-header {
+                 padding: 10px 15px;
+             }
+             
+             .gallery-counter {
+                 font-size: 14px;
+             }
+             
+             .gallery-main {
+                 padding: 10px;
+             }
+             
+             .gallery-photo-container {
+                 max-width: 95%;
+                 max-height: 95%;
+             }
+             
+             .gallery-photo-container img {
+                 max-height: 60vh;
+             }
+             
+             .photo-meta {
+                 flex-direction: column;
+                 gap: 5px;
+             }
+             
+             .gallery-nav {
+                 width: 40px;
+                 height: 40px;
+                 font-size: 16px;
+             }
+             
+             .gallery-nav.prev {
+                 left: 10px;
+             }
+             
+             .gallery-nav.next {
+                 right: 10px;
+             }
+             
+             .gallery-thumbnails {
+                 padding: 10px 15px;
+             }
+             
+             .thumbnail {
+                 width: 60px;
+                 height: 60px;
+             }
+         }
+
+         /* Animacje */
+         .full-gallery-modal {
+             animation: fadeIn 0.3s ease-out;
+         }
+
+         @keyframes fadeIn {
+             from {
+                 opacity: 0;
+             }
+             to {
+                 opacity: 1;
+             }
+         }
+
+         #galleryMainImage {
+             transition: opacity 0.3s ease;
+         }
+
+         /* Responsywność */
+         @media (max-width: 768px) {
+             .full-width-gallery {
+                 grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                 gap: 15px;
+             }
+             
+             .trichoscopy-header {
+                 flex-direction: column;
+                 gap: 15px;
+                 text-align: center;
+             }
+             
+             .trichoscopy-content, .visits-content {
+                 padding: 15px;
+             }
+
+             .photo-modal .modal-content {
+                 max-width: 95%;
+                 max-height: 95%;
+             }
+
+             .full-width-visits {
+                 grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                 gap: 15px;
+             }
+         }
+
+         /* Style specyficzne dla wizyt */
+         .visit-item {
+             min-height: 180px;
+             display: flex;
+             flex-direction: column;
+         }
+
+         .visit-info {
+             padding: 15px;
+             flex: 1;
+             display: flex;
+             flex-direction: column;
+         }
+
+         .visit-date {
+             font-size: 14px;
+             font-weight: 600;
+             color: #27ae60;
+             margin-bottom: 8px;
+         }
+
+         .visit-type {
+             font-size: 16px;
+             font-weight: 600;
+             color: #2c3e50;
+             margin-bottom: 5px;
+         }
+
+         .visit-doctor {
+             font-size: 13px;
+             color: #7f8c8d;
+             margin-bottom: 10px;
+         }
+
+         .visit-notes {
+             font-size: 12px;
+             color: #555;
+             font-style: italic;
+             margin-bottom: 15px;
+             flex: 1;
+         }
+
+         .visit-actions {
+             display: flex;
+             gap: 8px;
+             margin-top: auto;
+         }
+
+         .visit-actions .btn {
+             flex: 1;
+             padding: 6px 12px;
+             font-size: 12px;
+             border-radius: 6px;
+         }
+
+         .btn-secondary {
+             background: #6c757d;
+             color: white;
+             border: 1px solid #6c757d;
+         }
+
+         .btn-secondary:hover {
+             background: #5a6268;
+             border-color: #545b62;
+         }
+         
+         /* Style dla zaawansowanej galerii */
+         .advanced-gallery-modal {
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background: rgba(0,0,0,0.9);
+             z-index: 10000;
+             overflow-y: auto;
+         }
+
+         .advanced-gallery-content {
+             width: 100%;
+             min-height: 100vh;
+             display: flex;
+             flex-direction: column;
+         }
+
+         .advanced-gallery-header {
+             background: white;
+             padding: 15px 20px;
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             border-bottom: 1px solid #e1e8ed;
+         }
+
+         .advanced-gallery-controls {
+             display: flex;
+             align-items: center;
+             gap: 15px;
+         }
+
+         .filter-select, .sort-select {
+             padding: 8px 12px;
+             border: 1px solid #ddd;
+             border-radius: 6px;
+             font-size: 14px;
+         }
+
+         .close-advanced-gallery {
+             background: #e74c3c;
+             color: white;
+             border: none;
+             padding: 8px 16px;
+             border-radius: 6px;
+             cursor: pointer;
+             font-size: 14px;
+         }
+
+         .advanced-gallery-main {
+             flex: 1;
+             padding: 20px;
+             background: #f8f9fa;
+         }
+
+         .advanced-photo-grid {
+             display: grid;
+             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+             gap: 20px;
+         }
+
+         .advanced-photo-item {
+             background: white;
+             border-radius: 12px;
+             overflow: hidden;
+             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+             transition: all 0.3s ease;
+             cursor: pointer;
+             position: relative;
+         }
+
+         .advanced-photo-item:hover {
+             transform: translateY(-4px);
+             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+         }
+
+         .advanced-photo-item.selected {
+             border: 3px solid #4CAF50;
+             box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+         }
+
+         .advanced-photo-item img {
+             width: 100%;
+             height: 200px;
+             object-fit: cover;
+         }
+
+         .advanced-photo-info {
+             padding: 15px;
+         }
+
+         .advanced-photo-region {
+             font-weight: 600;
+             color: #2c3e50;
+             margin-bottom: 5px;
+         }
+
+         .advanced-photo-date {
+             font-size: 12px;
+             color: #7f8c8d;
+             margin-bottom: 8px;
+         }
+
+         .advanced-photo-note {
+             font-size: 12px;
+             color: #555;
+             font-style: italic;
+         }
+
+         .selection-badge {
+             position: absolute;
+             top: 10px;
+             right: 10px;
+             background: #4CAF50;
+             color: white;
+             border-radius: 50%;
+             width: 30px;
+             height: 30px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 14px;
+             font-weight: bold;
+             z-index: 10;
+         }
+
+         .advanced-photo-actions {
+             position: absolute;
+             bottom: 10px;
+             right: 10px;
+             display: flex;
+             gap: 8px;
+             opacity: 0;
+             transition: opacity 0.3s ease;
+         }
+
+         .advanced-photo-item:hover .advanced-photo-actions {
+             opacity: 1;
+         }
+
+         .advanced-action-btn {
+             background: rgba(0,0,0,0.7);
+             color: white;
+             border: none;
+             padding: 8px;
+             border-radius: 6px;
+             cursor: pointer;
+             font-size: 12px;
+         }
+
+         .advanced-action-btn:hover {
+             background: rgba(0,0,0,0.9);
+         }
+
+        /* Dodatkowe style dla nowych elementów */
+        .home-care-summary #homeCareStatus,
+        .clinic-care-summary #clinicCareStatus {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .home-care-summary #homeCareStatus strong,
+        .clinic-care-summary #clinicCareStatus strong {
+            display: inline-block;
+            margin-bottom: 2px;
+        }
+    </style>
+
+    <script>
+        // Funkcje obsługi zaawansowanej galerii
+        
+        // Funkcja do renderowania zaawansowanej galerii
+        function renderAdvancedGallery() {
+            const grid = document.getElementById('advancedPhotoGrid');
+            const filter = document.getElementById('advancedPhotoFilter').value;
+            const sortBy = document.getElementById('advancedSortBy').value;
+            
+            let filteredPhotos = [...allPhotos];
+            
+            // Filtrowanie
+            const now = new Date();
+            switch(filter) {
+                case 'today':
+                    filteredPhotos = filteredPhotos.filter(photo => {
+                        const photoDate = new Date(photo.date);
+                        return photoDate.toDateString() === now.toDateString();
+                    });
+                    break;
+                case 'week':
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    filteredPhotos = filteredPhotos.filter(photo => new Date(photo.date) >= weekAgo);
+                    break;
+                case 'month':
+                    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    filteredPhotos = filteredPhotos.filter(photo => new Date(photo.date) >= monthAgo);
+                    break;
+            }
+            
+            // Sortowanie
+            switch(sortBy) {
+                case 'newest':
+                    filteredPhotos.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    break;
+                case 'oldest':
+                    filteredPhotos.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    break;
+                case 'region':
+                    filteredPhotos.sort((a, b) => a.head_region.localeCompare(b.head_region));
+                    break;
+                case 'region-desc':
+                    filteredPhotos.sort((a, b) => b.head_region.localeCompare(a.head_region));
+                    break;
+            }
+            
+            grid.innerHTML = '';
+            
+            if (filteredPhotos.length === 0) {
+                grid.innerHTML = '<div style="text-align: center; color: #666; grid-column: 1 / -1; padding: 40px;">Brak zdjęć spełniających kryteria</div>';
+                return;
+            }
+            
+            filteredPhotos.forEach((photo, index) => {
+                const isSelected = selectedPhotosForComparison.some(p => p.id === photo.id);
+                const selectionIndex = selectedPhotosForComparison.findIndex(p => p.id === photo.id);
+                
+                const photoElement = document.createElement('div');
+                photoElement.className = `advanced-photo-item ${isSelected ? 'selected' : ''}`;
+                photoElement.innerHTML = `
+                    <img src="${photo.url}" alt="Trychoskopia">
+                    ${isSelected ? `<div class="selection-badge">${selectionIndex + 1}</div>` : ''}
+                    <div class="advanced-photo-info">
+                        <div class="advanced-photo-region">${photo.head_region}</div>
+                        <div class="advanced-photo-date">${new Date(photo.date).toLocaleDateString('pl-PL', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}</div>
+                        ${photo.note ? `<div class="advanced-photo-note">${photo.note}</div>` : ''}
+                    </div>
+                    <div class="advanced-photo-actions">
+                        <button class="advanced-action-btn" onclick="selectAdvancedForComparison(${index}, event)" title="${isSelected ? 'Usuń z porównania' : 'Dodaj do porównania'}">
+                            <i class="fas fa-balance-scale"></i>
+                        </button>
+                        <button class="advanced-action-btn" onclick="openPhotoModal('${photo.url}')" title="Powiększ">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                `;
+                
+                // Dodaj event listener do kliknięcia w zdjęcie
+                photoElement.addEventListener('click', function(e) {
+                    if (!e.target.closest('.advanced-photo-actions')) {
+                        openPhotoModal(photo.url);
+                    }
+                });
+                
+                grid.appendChild(photoElement);
+            });
+            
+            updateAdvancedComparisonUI();
+        }
+
+        // Funkcja do wybierania zdjęć do porównania
+        function selectAdvancedForComparison(photoIndex, event) {
+            event.stopPropagation();
+            
+            const filter = document.getElementById('advancedPhotoFilter').value;
+            const sortBy = document.getElementById('advancedSortBy').value;
+            
+            let filteredPhotos = [...allPhotos];
+            
+            // Zastosuj te same filtry co w renderAdvancedGallery
+            const now = new Date();
+            switch(filter) {
+                case 'today':
+                    filteredPhotos = filteredPhotos.filter(photo => {
+                        const photoDate = new Date(photo.date);
+                        return photoDate.toDateString() === now.toDateString();
+                    });
+                    break;
+                case 'week':
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    filteredPhotos = filteredPhotos.filter(photo => new Date(photo.date) >= weekAgo);
+                    break;
+                case 'month':
+                    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    filteredPhotos = filteredPhotos.filter(photo => new Date(photo.date) >= monthAgo);
+                    break;
+            }
+            
+            // Zastosuj sortowanie
+            switch(sortBy) {
+                case 'newest':
+                    filteredPhotos.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    break;
+                case 'oldest':
+                    filteredPhotos.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    break;
+                case 'region':
+                    filteredPhotos.sort((a, b) => a.head_region.localeCompare(b.head_region));
+                    break;
+                case 'region-desc':
+                    filteredPhotos.sort((a, b) => b.head_region.localeCompare(a.head_region));
+                    break;
+            }
+            
+            const photo = filteredPhotos[photoIndex];
+            const isAlreadySelected = selectedPhotosForComparison.some(p => p.id === photo.id);
+            
+            if (isAlreadySelected) {
+                // Usuń z wyboru
+                selectedPhotosForComparison = selectedPhotosForComparison.filter(p => p.id !== photo.id);
+                showNotification('Zdjęcie usunięte z porównania', 'info');
+            } else {
+                // Dodaj do wyboru
+                if (selectedPhotosForComparison.length >= 2) {
+                    showNotification('Możesz wybrać maksymalnie 2 zdjęcia do porównania', 'warning');
+                    return;
+                }
+                
+                selectedPhotosForComparison.push(photo);
+                showNotification(`Zdjęcie ${selectedPhotosForComparison.length}/2 wybrane do porównania`, 'success');
+                
+                if (selectedPhotosForComparison.length === 2) {
+                    setTimeout(() => {
+                        startAdvancedPhotoComparison();
+                    }, 1000);
+                }
+            }
+            
+            renderAdvancedGallery();
+        }
+
+        // Funkcja do aktualizacji interfejsu porównania
+        function updateAdvancedComparisonUI() {
+            const panel = document.getElementById('advancedComparisonPanel');
+            const count = document.getElementById('advancedComparisonCount');
+            const photos = document.getElementById('advancedSelectedPhotos');
+            const actions = document.getElementById('advancedComparisonActions');
+            
+            if (panel) {
+                panel.style.display = selectedPhotosForComparison.length > 0 ? 'block' : 'none';
+            }
+            
+            if (count) {
+                count.textContent = selectedPhotosForComparison.length;
+            }
+            
+            if (photos) {
+                photos.innerHTML = '';
+                selectedPhotosForComparison.forEach((photo, index) => {
+                    const photoElement = document.createElement('div');
+                    photoElement.style.cssText = `
+                        position: relative;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 4px;
+                        overflow: hidden;
+                        border: 2px solid #2196F3;
+                    `;
+                    
+                    photoElement.innerHTML = `
+                        <img src="${photo.url}" style="
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        ">
+                        <div style="
+                            position: absolute;
+                            top: 0;
+                            right: 0;
+                            background: #2196F3;
+                            color: white;
+                            width: 16px;
+                            height: 16px;
+                            font-size: 10px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: bold;
+                        ">${index + 1}</div>
+                    `;
+                    
+                    photos.appendChild(photoElement);
+                });
+            }
+            
+            if (actions) {
+                actions.innerHTML = '';
+                
+                if (selectedPhotosForComparison.length === 2) {
+                    const compareButton = document.createElement('button');
+                    compareButton.textContent = 'Porównaj';
+                    compareButton.style.cssText = `
+                        background: #4CAF50;
+                        color: white;
+                        border: none;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 11px;
+                        font-weight: bold;
+                    `;
+                    compareButton.onclick = startAdvancedPhotoComparison;
+                    actions.appendChild(compareButton);
+                }
+            }
+        }
+
+        // Funkcja do rozpoczęcia porównania zdjęć
+        function startAdvancedPhotoComparison() {
+            if (selectedPhotosForComparison.length !== 2) {
+                showNotification('Wybierz dokładnie 2 zdjęcia do porównania', 'warning');
+                return;
+            }
+            
+            const photo1 = selectedPhotosForComparison[0];
+            const photo2 = selectedPhotosForComparison[1];
+            
+            showAdvancedPhotoComparison(photo1, photo2);
+            
+            // Wyczyść wybór po porównaniu
+            selectedPhotosForComparison = [];
+            updateAdvancedComparisonUI();
+            renderAdvancedGallery();
+        }
+
+        // Funkcja do pokazania porównania zdjęć
+        function showAdvancedPhotoComparison(photo1, photo2) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10001;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 20px;
+                border-radius: 12px;
+                max-width: 95vw;
+                max-height: 90vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                position: relative;
+                margin: 20px;
+                width: 90vw;
+                box-sizing: border-box;
+            `;
+            
+            content.innerHTML = `
+                <button style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer;" onclick="this.closest('div[style*=\"position: fixed\"]').remove()">×</button>
+                <h3 style="margin-top: 0; color: #333; text-align: center;">Porównanie zdjęć</h3>
+                <p style="text-align: center; color: #666; margin-bottom: 20px;">${photo1.head_region} vs ${photo2.head_region}</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                    <div style="text-align: center;">
+                        <h4 style="color: #666; margin-bottom: 5px;">${new Date(photo1.date).toLocaleDateString('pl-PL')}</h4>
+                        <h5 style="color: #4CAF50; margin-bottom: 10px; font-weight: normal;">${photo1.head_region}</h5>
+                        <img src="${photo1.url}" style="width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 6px; text-align: left;">
+                            <strong>Notatki:</strong> ${photo1.note || 'Brak notatek'}
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <h4 style="color: #666; margin-bottom: 5px;">${new Date(photo2.date).toLocaleDateString('pl-PL')}</h4>
+                        <h5 style="color: #4CAF50; margin-bottom: 10px; font-weight: normal;">${photo2.head_region}</h5>
+                        <img src="${photo2.url}" style="width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 6px; text-align: left;">
+                            <strong>Notatki:</strong> ${photo2.note || 'Brak notatek'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" style="
+                        background: #4CAF50;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                    ">Zamknij</button>
+                </div>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // Funkcja do czyszczenia porównania
+        function clearAdvancedComparison() {
+            selectedPhotosForComparison = [];
+            updateAdvancedComparisonUI();
+            renderAdvancedGallery();
+        }
+
+        // Funkcja do zamknięcia zaawansowanej galerii
+        function closeAdvancedGallery() {
+            const modal = document.getElementById('advancedGalleryModal');
+            if (modal) {
+                modal.remove();
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Funkcja do pokazania powiadomień
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : type === 'warning' ? '#ff9800' : type === 'error' ? '#f44336' : '#2196F3'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 6px;
+                z-index: 10002;
+                font-size: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Dodaj style animacji dla powiadomień
+        const notificationStyles = document.createElement('style');
+        notificationStyles.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(notificationStyles);
+    </script>
+    
+    <script src="/static/js/photo-editor.js"></script>
+    <script>
+        // Zmodyfikuj funkcję openPhotoModal aby używała edytora zdjęć
+        function openPhotoModal(photoUrl) {
+            const photo = allPhotos.find(p => p.url === photoUrl);
+            if (!photo) return;
+            
+            // Stwórz modal z edytorem
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.95);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 11000;
+                cursor: default;
+            `;
+            
+            // Stwórz kontener dla edytora
+            const editorContainer = document.createElement('div');
+            editorContainer.style.cssText = `
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 90%;
+                height: 90%;
+                max-width: 1200px;
+                max-height: 800px;
+            `;
+            
+            // Dodaj nagłówek z informacjami
+            const header = document.createElement('div');
+            header.style.cssText = `
+                position: absolute;
+                top: -60px;
+                left: 0;
+                right: 0;
+                color: white;
+                text-align: center;
+                font-size: 16px;
+                z-index: 1001;
+            `;
+            header.innerHTML = `
+                <div style="background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 20px; display: inline-block;">
+                    <i class="fas fa-microscope"></i> ${photo.head_region} - ${new Date(photo.date).toLocaleDateString('pl-PL')}
+                </div>
+            `;
+            
+            // Dodaj przycisk zamknięcia
+            const closeButton = document.createElement('button');
+            closeButton.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: rgba(255,255,255,0.9);
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                cursor: pointer;
+                font-size: 18px;
+                color: #333;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                z-index: 1001;
+            `;
+            closeButton.innerHTML = '<i class="fas fa-times"></i>';
+            closeButton.onclick = () => {
+                if (window.currentPhotoEditor) {
+                    window.currentPhotoEditor.destroy();
+                    window.currentPhotoEditor = null;
+                }
+                modal.remove();
+            };
+            
+            modal.appendChild(header);
+            modal.appendChild(editorContainer);
+            modal.appendChild(closeButton);
+            document.body.appendChild(modal);
+            
+            // Inicjalizuj edytor zdjęć
+            if (window.initPhotoEditor) {
+                window.initPhotoEditor(photoUrl, editorContainer).then((editor) => {
+                    window.currentPhotoEditor = editor;
+                }).catch((error) => {
+                    console.error('Błąd inicjalizacji edytora zdjęć:', error);
+                    // Fallback - pokaż zwykły obraz
+                    editorContainer.innerHTML = `
+                        <img src="${photoUrl}" style="
+                            max-width: 100%;
+                            max-height: 100%;
+                            object-fit: contain;
+                            border-radius: 8px;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                        ">
+                    `;
+                });
+            } else {
+                // Fallback - pokaż zwykły obraz
+                editorContainer.innerHTML = `
+                    <img src="${photoUrl}" style="
+                        max-width: 100%;
+                        max-height: 100%;
+                        object-fit: contain;
+                        border-radius: 8px;
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                    ">
+                `;
+            }
+            
+            // Zamknij na kliknięcie w tło
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    if (window.currentPhotoEditor) {
+                        window.currentPhotoEditor.destroy();
+                        window.currentPhotoEditor = null;
+                    }
+                    modal.remove();
+                }
+            });
+            
+            // Zamknij na ESC
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    if (window.currentPhotoEditor) {
+                        window.currentPhotoEditor.destroy();
+                        window.currentPhotoEditor = null;
+                    }
+                    modal.remove();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+        }
+    </script>
+</body>
+</html> 

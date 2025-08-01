@@ -1,0 +1,534 @@
+/* Main CSS file for the Trichology App */
+
+/* Modern Dashboard Styles */
+:root {
+    --primary-color: #4169E1;
+    --secondary-color: #1E2A38;
+    --background-color: #F8F9FA;
+    --sidebar-color: #1E2A38;
+    --text-color: #2C3E50;
+    --border-color: #E1E8ED;
+    --hover-color: #3457B2;
+    --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    --success-color: #2ECC71;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background-color: var(--sidebar-color);
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 2rem 0;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.sidebar-logo {
+    padding: 0 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.sidebar-logo img {
+    width: 40px;
+    height: 40px;
+}
+
+.sidebar-logo span {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+}
+
+.nav-item {
+    padding: 0.875rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-left-color: var(--primary-color);
+}
+
+.nav-item i {
+    font-size: 1.25rem;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 260px;
+    padding: 2rem;
+}
+
+/* Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.dashboard-title {
+    margin: 0;
+}
+
+.dashboard-title h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin: 0;
+}
+
+.dashboard-title p {
+    margin: 0.5rem 0 0;
+    color: #64748B;
+    font-size: 0.875rem;
+}
+
+/* Search Bar */
+.search-container {
+    position: relative;
+    max-width: 600px;
+    margin: 2rem 0;
+}
+
+.search-input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 0.875rem;
+    background-color: white;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748B;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-4px);
+}
+
+.stats-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(65, 105, 225, 0.1);
+}
+
+.stats-icon i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.stats-info h3 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--secondary-color);
+}
+
+.stats-info p {
+    margin: 0.25rem 0 0;
+    color: #64748B;
+    font-size: 0.875rem;
+}
+
+/* Table Styles */
+.table-container {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.table-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin: 0;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table th {
+    text-align: left;
+    padding: 1rem;
+    font-weight: 500;
+    color: #64748B;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(65, 105, 225, 0.05);
+}
+
+/* Button Styles */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--hover-color);
+    transform: translateY(-2px);
+}
+
+.btn i {
+    font-size: 1.25rem;
+}
+
+/* Calendar Styles */
+.calendar-container {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+    max-width: 90%;
+    margin: 0 auto;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.calendar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.calendar-nav {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.calendar-nav button {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.calendar-nav button:hover {
+    background-color: var(--background-color);
+}
+
+/* Zmniejszamy rozmiar elementów kalendarza */
+.fc {
+    font-size: 0.9em;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 1.2em;
+}
+
+.fc .fc-button {
+    padding: 0.4em 0.8em;
+    font-size: 0.9em;
+}
+
+.fc .fc-daygrid-day {
+    height: 100px;
+}
+
+.fc .fc-daygrid-day-number {
+    padding: 0.3em;
+}
+
+/* Helper classes */
+.text-muted {
+    color: #6c757d !important;
+}
+
+.mt-1 { margin-top: 0.25rem !important; }
+.mt-2 { margin-top: 0.5rem !important; }
+.mt-3 { margin-top: 1rem !important; }
+.mt-4 { margin-top: 1.5rem !important; }
+.mt-5 { margin-top: 3rem !important; }
+
+.mb-1 { margin-bottom: 0.25rem !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+.mb-5 { margin-bottom: 3rem !important; }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 80px;
+        padding: 1rem 0;
+    }
+    
+    .sidebar-logo span,
+    .nav-item span {
+        display: none;
+    }
+    
+    .main-content {
+        margin-left: 80px;
+    }
+    
+    .nav-item {
+        padding: 0.875rem;
+        justify-content: center;
+    }
+    
+    .nav-item i {
+        margin: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-content {
+        padding: 1rem;
+    }
+    
+    .table-container {
+        padding: 1rem;
+    }
+    
+    .calendar-container {
+        padding: 1rem;
+    }
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    max-height: calc(90vh - 140px);
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    line-height: 1;
+}
+
+.close-button:hover {
+    color: var(--primary-color);
+}
+
+.btn-secondary {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-color);
+}
+
+/* Table in modal */
+.modal .table-container {
+    margin-top: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.modal .table {
+    margin: 0;
+}
+
+.modal .table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.modal .table tbody tr:hover {
+    background-color: var(--hover-color);
+}
+
+/* Search in modal */
+.modal .search-container {
+    margin-bottom: 1rem;
+}
+
+/* Dashboard Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.dashboard-column {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+}
+
+.dashboard-column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-column-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+} 
