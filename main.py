@@ -18,6 +18,10 @@ import uvicorn
 import base64
 import requests
 from bs4 import BeautifulSoup
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from google_auth_oauthlib.flow import Flow
+import secrets
 
 
 # Configure logging to output to both console and file
@@ -1550,14 +1554,95 @@ def update_clinic_treatment(treatment_id, updates):
 # Initialize DB at startup
 init_db()
 
+# =============================================================================
+# GOOGLE OAUTH CONFIGURATION
+# =============================================================================
+
+# Google OAuth settings
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI', 'http://localhost:5001/auth/google/callback')
+
+def create_google_oauth_flow():
+    """Create Google OAuth flow"""
+    if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
+        return None
+    
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": [GOOGLE_REDIRECT_URI]
+            }
+        },
+        scopes=['openid', 'email', 'profile']
+    )
+    flow.redirect_uri = GOOGLE_REDIRECT_URI
+    return flow
+
+def get_or_create_google_user(google_id, email, first_name, last_name, picture=None):
+    """Get existing Google user or create new one"""
+    try:
+        # First check if user exists by google_id
+        user = get_user_by_google_id(google_id)
+        if user:
+            return user
+        
+        # Check if user exists by email (maybe registered normally)
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
+        existing_user = cursor.fetchone()
+        
+        if existing_user:
+            # Update existing user with Google ID
+            cursor.execute(
+                'UPDATE users SET google_id = ?, profile_picture = ?, updated_at = ? WHERE email = ?',
+                (google_id, picture, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), email)
+            )
+            conn.commit()
+            conn.close()
+            return get_user_by_google_id(google_id)
+        else:
+            # Create new user
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            cursor.execute('''
+                INSERT INTO users (email, first_name, last_name, google_id, profile_picture, 
+                                 role, is_active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, 'trichologist', 1, ?, ?)
+            ''', (email, first_name, last_name, google_id, picture, current_time, current_time))
+            
+            user_id = cursor.lastrowid
+            conn.commit()
+            conn.close()
+            
+            return {
+                'id': user_id,
+                'email': email,
+                'first_name': first_name,
+                'last_name': last_name,
+                'google_id': google_id,
+                'profile_picture': picture,
+                'role': 'trichologist',
+                'is_active': 1
+            }
+    except Exception as e:
+        logger.error(f"Error in get_or_create_google_user: {str(e)}")
+        if 'conn' in locals() and conn:
+            conn.close()
+        return None
+
 # API routes
 @app.get("/", name="home")
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def home(request: Request, user = Depends(require_auth)):
+    return templates.TemplateResponse("index.html", {"request": request, "user": user})
 
 
 @app.get("/new-documentation", name="new_documentation")
-async def new_documentation(request: Request):
+async def new_documentation(request: Request, user = Depends(require_auth)):
     try:
         import os
         template_path = os.path.join("test_templates", "documentation_form.html")
@@ -1632,7 +1717,7 @@ async def new_visit(request: Request, pesel: str):
     })
 
 @app.get("/patient/{pesel}", name="patient")
-async def patient(request: Request, pesel: str):
+async def patient(request: Request, pesel: str, user = Depends(require_auth)):
     patient_data = get_patient(pesel)
     if patient_data:
         # Pobierz historię wizyt pacjenta
@@ -1680,7 +1765,7 @@ async def edit_patient(request: Request, pesel: str):
     })
 
 @app.post("/api/save-patient", name="save_patient_api")
-async def save_patient_api(request: Request):
+async def save_patient_api(request: Request, user = Depends(require_auth)):
     # Log request method and content type
     logging.info(f"Received {request.method} request to /api/save-patient with content type: {request.headers.get('content-type')}")
     
@@ -1924,9 +2009,9 @@ async def calendar_events(start: Optional[str] = None, end: Optional[str] = None
         )
 
 @app.get("/patients", name="patients_list")
-async def patients_list(request: Request):
+async def patients_list(request: Request, user = Depends(require_auth)):
     patients = get_patients()
-    return templates.TemplateResponse("patients.html", {"request": request, "patients": patients})
+    return templates.TemplateResponse("patients.html", {"request": request, "patients": patients, "user": user})
 
 @app.get("/api/search-patients", name="search_patients_api")
 async def search_patients_api(request: Request, query: str = ""):
@@ -3402,6 +3487,101 @@ async def delete_treatment_api(treatment_id: int):
 # AUTHENTICATION ENDPOINTS
 # =============================================================================
 
+@app.get("/auth/google")
+async def google_login():
+    """Initiate Google OAuth login"""
+    try:
+        flow = create_google_oauth_flow()
+        if not flow:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "Google OAuth nie jest skonfigurowane"}
+            )
+        
+        authorization_url, state = flow.authorization_url(
+            access_type='offline',
+            include_granted_scopes='true',
+            prompt='select_account'
+        )
+        
+        # Store state in session for security
+        response = RedirectResponse(authorization_url)
+        response.set_cookie("oauth_state", state, max_age=600, httponly=True)  # 10 minutes
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error in google_login: {str(e)}")
+        return RedirectResponse("/login?error=oauth_error")
+
+@app.get("/auth/google/callback")
+async def google_callback(request: Request, code: str = Query(None), state: str = Query(None)):
+    """Handle Google OAuth callback"""
+    try:
+        # Verify state parameter
+        stored_state = request.cookies.get("oauth_state")
+        if not stored_state or stored_state != state:
+            return RedirectResponse("/login?error=invalid_state")
+        
+        if not code:
+            return RedirectResponse("/login?error=access_denied")
+        
+        flow = create_google_oauth_flow()
+        if not flow:
+            return RedirectResponse("/login?error=oauth_error")
+        
+        # Exchange authorization code for tokens
+        flow.fetch_token(code=code)
+        
+        # Get user info from Google
+        credentials = flow.credentials
+        request_session = google_requests.Request()
+        
+        # Verify the token and get user info
+        idinfo = id_token.verify_oauth2_token(
+            credentials.id_token, 
+            request_session, 
+            GOOGLE_CLIENT_ID
+        )
+        
+        google_id = idinfo['sub']
+        email = idinfo['email']
+        first_name = idinfo.get('given_name', '')
+        last_name = idinfo.get('family_name', '')
+        picture = idinfo.get('picture', '')
+        
+        # Get or create user
+        user = get_or_create_google_user(google_id, email, first_name, last_name, picture)
+        
+        if not user:
+            return RedirectResponse("/login?error=user_creation_failed")
+        
+        # Create session
+        session_token = create_session(user['id'])
+        
+        if not session_token:
+            return RedirectResponse("/login?error=session_creation_failed")
+        
+        # Redirect to main page with session cookie
+        response = RedirectResponse("/")
+        response.set_cookie(
+            key="session_token",
+            value=session_token,
+            max_age=30 * 24 * 60 * 60,  # 30 days
+            httponly=True,
+            secure=False,  # Set to True in production with HTTPS
+            samesite="lax"
+        )
+        
+        # Clear oauth state cookie
+        response.set_cookie("oauth_state", "", max_age=0)
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error in google_callback: {str(e)}")
+        return RedirectResponse("/login?error=oauth_error")
+
 @app.get("/login")
 async def login_page(request: Request):
     """Show login page"""
@@ -3411,6 +3591,29 @@ async def login_page(request: Request):
 async def register_page(request: Request):
     """Show registration page"""
     return templates.TemplateResponse("register.html", {"request": request})
+
+@app.post("/logout")
+async def logout(request: Request):
+    """Logout user and destroy session"""
+    try:
+        # Get session token
+        session_token = request.cookies.get("session_token")
+        
+        if session_token:
+            # Delete session from database
+            delete_session(session_token)
+        
+        # Redirect to login with cleared cookie
+        response = RedirectResponse("/login", status_code=302)
+        response.set_cookie("session_token", "", max_age=0)
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error in logout: {str(e)}")
+        response = RedirectResponse("/login", status_code=302) 
+        response.set_cookie("session_token", "", max_age=0)
+        return response
 
 @app.post("/api/login")
 async def login_api(request: Request, 
