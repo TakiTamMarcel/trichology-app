@@ -6,4 +6,5 @@ beautifulsoup4==4.10.0
 requests==2.26.0
 google-api-python-client==2.70.0
 google-auth-httplib2==0.1.0
-google-auth-oauthlib==0.7.1 
+google-auth-oauthlib==0.7.1
+aiofiles==0.7.0 
