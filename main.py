@@ -23,6 +23,8 @@ from google.auth.transport import requests as google_requests
 from google_auth_oauthlib.flow import Flow
 import secrets
 
+# Development mode - disable authentication for local development
+DEV_MODE = os.environ.get('DEV_MODE', 'true').lower() == 'true'
 
 # Configure logging to output to both console and file
 logging.basicConfig(
@@ -159,6 +161,18 @@ def get_current_user(request: Request):
     Get current authenticated user from session cookie.
     Returns user data or None if not authenticated.
     """
+    # In development mode, return fake user
+    if DEV_MODE:
+        return {
+            'id': 1,
+            'email': 'dev@trichology.local',
+            'first_name': 'Developer',
+            'last_name': 'User',
+            'role': 'trichologist',
+            'is_active': 1,
+            'profile_picture': None
+        }
+    
     try:
         # Get session token from cookie
         session_token = request.cookies.get("session_token")
@@ -178,6 +192,18 @@ def require_auth(request: Request):
     Dependency that requires authentication.
     Raises HTTPException if user not authenticated.
     """
+    # In development mode, return fake user
+    if DEV_MODE:
+        return {
+            'id': 1,
+            'email': 'dev@trichology.local',
+            'first_name': 'Developer',
+            'last_name': 'User',
+            'role': 'trichologist',
+            'is_active': 1,
+            'profile_picture': None
+        }
+    
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Authentication required")
@@ -1553,6 +1579,12 @@ def update_clinic_treatment(treatment_id, updates):
 
 # Initialize DB at startup
 init_db()
+
+# Log development mode status
+if DEV_MODE:
+    logger.warning("⚠️  DEVELOPMENT MODE ENABLED - Authentication is disabled!")
+else:
+    logger.info("🔒 Production mode - Authentication required")
 
 # =============================================================================
 # GOOGLE OAUTH CONFIGURATION
@@ -3491,6 +3523,10 @@ async def delete_treatment_api(treatment_id: int):
 async def google_login():
     """Initiate Google OAuth login"""
     try:
+        # In development mode, redirect to home with mock authentication
+        if DEV_MODE:
+            return RedirectResponse("/")
+        
         flow = create_google_oauth_flow()
         if not flow:
             return JSONResponse(
