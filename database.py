@@ -290,24 +290,47 @@ def init_db():
             )
         ''')
         
+        # Add new columns to users table for invitation system
+        cursor.execute("PRAGMA table_info(users)")
+        users_columns = {row[1] for row in cursor.fetchall()}
+        
+        users_new_columns = [
+            ('invited_by', 'INTEGER'),
+            ('invited_at', 'TEXT'),
+            ('first_login_at', 'TEXT'),
+            ('last_login_at', 'TEXT'),
+            ('invitation_status', 'TEXT DEFAULT "pending"')  # pending, accepted, revoked
+        ]
+        
+        for col_name, col_type in users_new_columns:
+            if col_name not in users_columns:
+                try:
+                    print(f"Adding missing column to users: {col_name}")
+                    cursor.execute(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}")
+                except sqlite3.Error as e:
+                    print(f"Error adding users column {col_name}: {str(e)}")
+        
+        # Update existing users table to use new role system (admin/user instead of trichologist)
+        try:
+            cursor.execute("UPDATE users SET role = 'admin' WHERE role = 'trichologist' OR email LIKE '%admin%'")
+            cursor.execute("UPDATE users SET role = 'user' WHERE role NOT IN ('admin', 'user')")
+            if cursor.rowcount > 0:
+                print(f"Updated {cursor.rowcount} users with new role system")
+        except sqlite3.Error as e:
+            print(f"Error updating user roles: {str(e)}")
+        
         # Create default admin user if no users exist
         cursor.execute('SELECT COUNT(*) FROM users')
         if cursor.fetchone()[0] == 0:
-            import hashlib
-            import secrets
-            
-            # Generate a random password for the default admin
-            default_password = secrets.token_urlsafe(16)
-            password_hash = hashlib.sha256(default_password.encode()).hexdigest()
-            
             current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             cursor.execute('''
-                INSERT INTO users (email, password_hash, first_name, last_name, role, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', ('admin@trichology.com', password_hash, 'Admin', 'Administrator', 'admin', current_time, current_time))
+                INSERT INTO users (email, password_hash, first_name, last_name, role, invitation_status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', ('admin@yourdomain.com', None, 'Admin', 'Administrator', 'admin', 'accepted', current_time, current_time))
             
-            print(f"Created default admin user: admin@trichology.com with password: {default_password}")
-            print("Please change this password after first login!")
+            print("📧 Created default admin user: admin@yourdomain.com")
+            print("⚠️  IMPORTANT: Change this email to your Google account email in Railway environment variables!")
+            print("🔧 Set ADMIN_EMAIL=your-google-email@gmail.com in Railway Variables")
         
         conn.commit()
         conn.close()
@@ -1768,4 +1791,288 @@ def change_user_password(user_id, new_password):
         if 'conn' in locals() and conn:
             conn.rollback()
             conn.close()
-        return {'success': False, 'error': f'Nieoczekiwany błąd: {str(e)}'} 
+        return {'success': False, 'error': f'Nieoczekiwany błąd: {str(e)}'}
+
+# =============================================================================
+# GOOGLE OAUTH & INVITATION SYSTEM FUNCTIONS
+# =============================================================================
+
+def is_user_allowed(email):
+    """
+    Check if email is allowed to login (invited or admin)
+    Returns user data if allowed, None otherwise
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, email, first_name, last_name, role, is_active, google_id, invitation_status
+            FROM users 
+            WHERE email = ? AND is_active = 1 AND invitation_status = 'accepted'
+        ''', (email,))
+        
+        row = cursor.fetchone()
+        conn.close()
+        
+        if row:
+            return {
+                'id': row[0],
+                'email': row[1],
+                'first_name': row[2],
+                'last_name': row[3],
+                'role': row[4],
+                'is_active': row[5],
+                'google_id': row[6],
+                'invitation_status': row[7]
+            }
+        
+        return None
+        
+    except sqlite3.Error as e:
+        print(f"SQLite error in is_user_allowed: {str(e)}")
+        if 'conn' in locals() and conn:
+            conn.close()
+        return None
+
+def get_or_create_google_user_new(google_id, email, first_name, last_name, picture=None):
+    """
+    Get existing Google user or create if email is on allowed list
+    Returns user data if successful, None if not allowed
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # First check if user exists by google_id
+        cursor.execute('''
+            SELECT id, email, first_name, last_name, role, is_active, google_id
+            FROM users 
+            WHERE google_id = ? AND is_active = 1
+        ''', (google_id,))
+        
+        existing_user = cursor.fetchone()
+        if existing_user:
+            # Update last login
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            cursor.execute('UPDATE users SET last_login_at = ? WHERE id = ?', 
+                          (current_time, existing_user[0]))
+            conn.commit()
+            conn.close()
+            
+            return {
+                'id': existing_user[0],
+                'email': existing_user[1],
+                'first_name': existing_user[2],
+                'last_name': existing_user[3],
+                'role': existing_user[4],
+                'is_active': existing_user[5],
+                'google_id': existing_user[6]
+            }
+        
+        # Check if email is on allowed list
+        cursor.execute('''
+            SELECT id, role, invitation_status
+            FROM users 
+            WHERE email = ? AND is_active = 1
+        ''', (email,))
+        
+        allowed_user = cursor.fetchone()
+        if not allowed_user or allowed_user[2] != 'accepted':
+            conn.close()
+            return None  # User not invited or invitation not accepted
+        
+        # Update existing user with Google ID (first login)
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        cursor.execute('''
+            UPDATE users SET 
+                google_id = ?, 
+                first_name = ?, 
+                last_name = ?, 
+                profile_picture = ?,
+                first_login_at = ?,
+                last_login_at = ?,
+                updated_at = ?
+            WHERE email = ?
+        ''', (google_id, first_name, last_name, picture, current_time, current_time, current_time, email))
+        
+        conn.commit()
+        
+        # Get updated user data
+        cursor.execute('''
+            SELECT id, email, first_name, last_name, role, is_active, google_id
+            FROM users 
+            WHERE email = ?
+        ''', (email,))
+        
+        user_row = cursor.fetchone()
+        conn.close()
+        
+        if user_row:
+            return {
+                'id': user_row[0],
+                'email': user_row[1],
+                'first_name': user_row[2],
+                'last_name': user_row[3],
+                'role': user_row[4],
+                'is_active': user_row[5],
+                'google_id': user_row[6]
+            }
+        
+        return None
+        
+    except sqlite3.Error as e:
+        print(f"SQLite error in get_or_create_google_user_new: {str(e)}")
+        if 'conn' in locals() and conn:
+            conn.rollback()
+            conn.close()
+        return None
+
+def invite_user(admin_id, email, first_name='', last_name='', role='user'):
+    """
+    Invite a new user to the system (admin only)
+    Returns dict with success/error information
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Check if inviter is admin
+        cursor.execute('SELECT role FROM users WHERE id = ?', (admin_id,))
+        admin_role = cursor.fetchone()
+        if not admin_role or admin_role[0] != 'admin':
+            conn.close()
+            return {'success': False, 'error': 'Tylko admin może zapraszać użytkowników'}
+        
+        # Check if user already exists
+        cursor.execute('SELECT id, invitation_status FROM users WHERE email = ?', (email,))
+        existing = cursor.fetchone()
+        if existing:
+            if existing[1] == 'accepted':
+                conn.close()
+                return {'success': False, 'error': 'Użytkownik już istnieje w systemie'}
+            elif existing[1] == 'pending':
+                conn.close()
+                return {'success': False, 'error': 'Zaproszenie już zostało wysłane'}
+        
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        if existing:
+            # Update existing invitation
+            cursor.execute('''
+                UPDATE users SET 
+                    first_name = ?, 
+                    last_name = ?, 
+                    role = ?, 
+                    invited_by = ?, 
+                    invited_at = ?,
+                    invitation_status = 'pending',
+                    updated_at = ?
+                WHERE email = ?
+            ''', (first_name, last_name, role, admin_id, current_time, current_time, email))
+        else:
+            # Create new invitation
+            cursor.execute('''
+                INSERT INTO users (email, first_name, last_name, role, invited_by, invited_at, invitation_status, is_active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'pending', 1, ?, ?)
+            ''', (email, first_name, last_name, role, admin_id, current_time, current_time, current_time))
+        
+        conn.commit()
+        conn.close()
+        
+        return {'success': True, 'message': f'Zaproszenie wysłane do {email}'}
+        
+    except sqlite3.Error as e:
+        print(f"SQLite error in invite_user: {str(e)}")
+        if 'conn' in locals() and conn:
+            conn.rollback()
+            conn.close()
+        return {'success': False, 'error': f'Błąd bazy danych: {str(e)}'}
+
+def get_all_users(admin_id):
+    """
+    Get all users (admin only)
+    Returns list of users or None if not admin
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Check if requester is admin
+        cursor.execute('SELECT role FROM users WHERE id = ?', (admin_id,))
+        admin_role = cursor.fetchone()
+        if not admin_role or admin_role[0] != 'admin':
+            conn.close()
+            return None
+        
+        cursor.execute('''
+            SELECT id, email, first_name, last_name, role, is_active, 
+                   invitation_status, invited_at, first_login_at, last_login_at
+            FROM users 
+            ORDER BY created_at DESC
+        ''')
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        users = []
+        for row in rows:
+            users.append({
+                'id': row[0],
+                'email': row[1],
+                'first_name': row[2],
+                'last_name': row[3],
+                'role': row[4],
+                'is_active': row[5],
+                'invitation_status': row[6],
+                'invited_at': row[7],
+                'first_login_at': row[8],
+                'last_login_at': row[9]
+            })
+        
+        return users
+        
+    except sqlite3.Error as e:
+        print(f"SQLite error in get_all_users: {str(e)}")
+        if 'conn' in locals() and conn:
+            conn.close()
+        return None
+
+def remove_user(admin_id, user_id):
+    """
+    Remove/deactivate user (admin only)
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Check if requester is admin
+        cursor.execute('SELECT role FROM users WHERE id = ?', (admin_id,))
+        admin_role = cursor.fetchone()
+        if not admin_role or admin_role[0] != 'admin':
+            conn.close()
+            return {'success': False, 'error': 'Tylko admin może usuwać użytkowników'}
+        
+        # Don't allow admin to remove themselves
+        if admin_id == user_id:
+            conn.close()
+            return {'success': False, 'error': 'Nie możesz usunąć samego siebie'}
+        
+        # Deactivate user instead of deleting
+        cursor.execute('UPDATE users SET is_active = 0 WHERE id = ?', (user_id,))
+        
+        if cursor.rowcount == 0:
+            conn.close()
+            return {'success': False, 'error': 'Użytkownik nie znaleziony'}
+        
+        conn.commit()
+        conn.close()
+        
+        return {'success': True, 'message': 'Użytkownik został usunięty'}
+        
+    except sqlite3.Error as e:
+        print(f"SQLite error in remove_user: {str(e)}")
+        if 'conn' in locals() and conn:
+            conn.rollback()
+            conn.close()
+        return {'success': False, 'error': f'Błąd bazy danych: {str(e)}'} 

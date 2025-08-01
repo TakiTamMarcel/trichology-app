@@ -1616,55 +1616,14 @@ def create_google_oauth_flow():
     return flow
 
 def get_or_create_google_user(google_id, email, first_name, last_name, picture=None):
-    """Get existing Google user or create new one"""
+    """Get existing Google user or create if email is on allowed list"""
     try:
-        # First check if user exists by google_id
-        user = get_user_by_google_id(google_id)
-        if user:
-            return user
+        # Use new invitation-based system
+        from database import get_or_create_google_user_new
+        return get_or_create_google_user_new(google_id, email, first_name, last_name, picture)
         
-        # Check if user exists by email (maybe registered normally)
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
-        existing_user = cursor.fetchone()
-        
-        if existing_user:
-            # Update existing user with Google ID
-            cursor.execute(
-                'UPDATE users SET google_id = ?, profile_picture = ?, updated_at = ? WHERE email = ?',
-                (google_id, picture, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), email)
-            )
-            conn.commit()
-            conn.close()
-            return get_user_by_google_id(google_id)
-        else:
-            # Create new user
-            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            cursor.execute('''
-                INSERT INTO users (email, first_name, last_name, google_id, profile_picture, 
-                                 role, is_active, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, 'trichologist', 1, ?, ?)
-            ''', (email, first_name, last_name, google_id, picture, current_time, current_time))
-            
-            user_id = cursor.lastrowid
-            conn.commit()
-            conn.close()
-            
-            return {
-                'id': user_id,
-                'email': email,
-                'first_name': first_name,
-                'last_name': last_name,
-                'google_id': google_id,
-                'profile_picture': picture,
-                'role': 'trichologist',
-                'is_active': 1
-            }
     except Exception as e:
         logger.error(f"Error in get_or_create_google_user: {str(e)}")
-        if 'conn' in locals() and conn:
-            conn.close()
         return None
 
 # API routes
@@ -3650,6 +3609,93 @@ async def logout(request: Request):
         response = RedirectResponse("/login", status_code=302) 
         response.set_cookie("session_token", "", max_age=0)
         return response
+
+# =============================================================================
+# ADMIN USER MANAGEMENT ENDPOINTS
+# =============================================================================
+
+@app.get("/admin/users")
+async def admin_users_page(request: Request, user = Depends(require_auth)):
+    """Admin panel for user management"""
+    if user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Tylko admin ma dostęp do tego panelu")
+    
+    return templates.TemplateResponse("admin_users.html", {"request": request, "user": user})
+
+@app.get("/api/admin/users")
+async def get_users_api(request: Request, user = Depends(require_auth)):
+    """Get all users (admin only)"""
+    try:
+        if user.get('role') != 'admin':
+            return JSONResponse(status_code=403, content={"error": "Dostęp tylko dla administratora"})
+        
+        from database import get_all_users
+        users = get_all_users(user['id'])
+        
+        if users is None:
+            return JSONResponse(status_code=403, content={"error": "Dostęp zabroniony"})
+        
+        return JSONResponse(content={"success": True, "users": users})
+        
+    except Exception as e:
+        logger.error(f"Error in get_users_api: {str(e)}")
+        return JSONResponse(status_code=500, content={"error": "Błąd serwera"})
+
+@app.post("/api/admin/invite-user")
+async def invite_user_api(request: Request, user = Depends(require_auth)):
+    """Invite new user (admin only)"""
+    try:
+        if user.get('role') != 'admin':
+            return JSONResponse(status_code=403, content={"error": "Dostęp tylko dla administratora"})
+        
+        form_data = await request.form()
+        email = form_data.get('email', '').strip()
+        first_name = form_data.get('first_name', '').strip()
+        last_name = form_data.get('last_name', '').strip()
+        role = form_data.get('role', 'user').strip()
+        
+        if not email:
+            return JSONResponse(status_code=400, content={"error": "Email jest wymagany"})
+        
+        # Validate email format
+        import re
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, email):
+            return JSONResponse(status_code=400, content={"error": "Nieprawidłowy format email"})
+        
+        if role not in ['admin', 'user']:
+            return JSONResponse(status_code=400, content={"error": "Nieprawidłowa rola"})
+        
+        from database import invite_user
+        result = invite_user(user['id'], email, first_name, last_name, role)
+        
+        if result['success']:
+            return JSONResponse(content={"success": True, "message": result['message']})
+        else:
+            return JSONResponse(status_code=400, content={"error": result['error']})
+        
+    except Exception as e:
+        logger.error(f"Error in invite_user_api: {str(e)}")
+        return JSONResponse(status_code=500, content={"error": "Błąd serwera"})
+
+@app.delete("/api/admin/users/{user_id}")
+async def remove_user_api(request: Request, user_id: int, user = Depends(require_auth)):
+    """Remove user (admin only)"""
+    try:
+        if user.get('role') != 'admin':
+            return JSONResponse(status_code=403, content={"error": "Dostęp tylko dla administratora"})
+        
+        from database import remove_user
+        result = remove_user(user['id'], user_id)
+        
+        if result['success']:
+            return JSONResponse(content={"success": True, "message": result['message']})
+        else:
+            return JSONResponse(status_code=400, content={"error": result['error']})
+        
+    except Exception as e:
+        logger.error(f"Error in remove_user_api: {str(e)}")
+        return JSONResponse(status_code=500, content={"error": "Błąd serwera"})
 
 @app.post("/api/login")
 async def login_api(request: Request, 
