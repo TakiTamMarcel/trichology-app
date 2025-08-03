@@ -1610,7 +1610,7 @@ def create_google_oauth_flow():
                 "redirect_uris": [GOOGLE_REDIRECT_URI]
             }
         },
-        scopes=['openid', 'email', 'profile']
+        scopes=['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
     )
     flow.redirect_uri = GOOGLE_REDIRECT_URI
     return flow
