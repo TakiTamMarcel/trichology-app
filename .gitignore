@@ -65,4 +65,8 @@ tmp/
 # Pliki konfiguracyjne środowiska
 .env
 .env.local
-.env.production 
+.env.production
+
+# Pliki migracji (usuwane po deployment dla bezpieczeństwa)
+migrate_*.py
+*_migration_log.json 
