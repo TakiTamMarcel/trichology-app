@@ -1582,9 +1582,14 @@ def update_clinic_treatment(treatment_id, updates):
 init_db()
 
 # Log development mode status
-if DEV_MODE:
-    logger.warning("⚠️  DEVELOPMENT MODE ENABLED - Authentication is disabled!")
-else:
+try:
+    if DEV_MODE:
+        logger.warning("⚠️  DEVELOPMENT MODE ENABLED - Authentication is disabled!")
+    else:
+        logger.info("🔒 Production mode - Authentication required")
+except NameError:
+    logger.error("❌ DEV_MODE not defined - defaulting to production mode")
+    DEV_MODE = False
     logger.info("🔒 Production mode - Authentication required")
 
 # =============================================================================
