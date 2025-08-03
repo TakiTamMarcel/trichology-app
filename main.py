@@ -1937,6 +1937,38 @@ async def save_patient_api(request: Request, user = Depends(require_auth)):
             content={"success": False, "error": str(e)}
         )
 
+# SZYBKA PONOWNA MIGRACJA PO KOLEJNYM RESECIE RAILWAY!
+@app.post("/api/speed-migrate-patient", name="speed_migrate_patient")
+async def speed_migrate_patient(request: Request):
+    """SZYBKA migracja po kolejnym resecie Railway - usuń natychmiast!"""
+    try:
+        data = await request.json()
+        
+        # Hasło migracji
+        if data.get('migrate_password', '') != 'SPEED_MIGRATE_AUG_03':
+            return JSONResponse(status_code=403, content={"success": False, "error": "Wrong password"})
+        
+        # Usuń hasło
+        if 'migrate_password' in data:
+            del data['migrate_password']
+        
+        # Walidacja
+        for field in ['name', 'surname', 'pesel']:
+            if field not in data or not data[field]:
+                return JSONResponse(status_code=400, content={"success": False, "error": f"Missing: {field}"})
+        
+        # Migruj
+        from database import save_patient
+        db_response = save_patient(data)
+        
+        if db_response.get('success', False):
+            return JSONResponse(content={"success": True, "message": "Patient migrated"})
+        else:
+            return JSONResponse(status_code=500, content={"success": False, "error": db_response.get('error', 'DB error')})
+    
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
+
 # Tymczasowy endpoint migracji został usunięty po zakończeniu migracji (2025-08-03) 
 @app.get("/api/calendar-events", name="calendar_events")
 async def calendar_events(start: Optional[str] = None, end: Optional[str] = None):
