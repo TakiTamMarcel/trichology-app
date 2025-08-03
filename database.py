@@ -266,7 +266,7 @@ def init_db():
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
+                password_hash TEXT,
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
                 role TEXT DEFAULT 'trichologist',
@@ -326,7 +326,7 @@ def init_db():
             cursor.execute('''
                 INSERT INTO users (email, password_hash, first_name, last_name, role, invitation_status, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', ('admin@yourdomain.com', None, 'Admin', 'Administrator', 'admin', 'accepted', current_time, current_time))
+            ''', ('admin@yourdomain.com', '', 'Admin', 'Administrator', 'admin', 'accepted', current_time, current_time))
             
             print("📧 Created default admin user: admin@yourdomain.com")
             print("⚠️  IMPORTANT: Change this email to your Google account email in Railway environment variables!")
