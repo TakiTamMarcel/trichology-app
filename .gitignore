@@ -58,9 +58,9 @@ Thumbs.db
 temp/
 tmp/
 
-# Uploads (opcjonalnie - usuń jeśli chcesz śledzić pliki)
-static/uploads/
-uploads/
+# Uploads - teraz dodane do repository dla Railway deployment
+# static/uploads/
+# uploads/
 
 # Pliki konfiguracyjne środowiska
 .env
