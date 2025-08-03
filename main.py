@@ -1937,6 +1937,62 @@ async def save_patient_api(request: Request, user = Depends(require_auth)):
             content={"success": False, "error": str(e)}
         )
 
+# PONOWNY TYMCZASOWY ENDPOINT MIGRACJI - USUŃ PO ZAKOŃCZENIU!
+@app.post("/api/final-migrate-patient", name="final_migrate_patient")
+async def final_migrate_patient(request: Request):
+    """
+    UWAGA: Ponowny endpoint migracji po reset bazy Railway!
+    Usuń ten endpoint po zakończeniu migracji!
+    """
+    try:
+        data = await request.json()
+        
+        # Sprawdź nowe hasło migracji
+        migrate_password = data.get('migrate_password', '')
+        if migrate_password != 'FINAL_MIGRATE_AUG_2025':
+            return JSONResponse(
+                status_code=403,
+                content={"success": False, "error": "Nieprawidłowe hasło migracji"}
+            )
+        
+        # Usuń hasło z danych
+        if 'migrate_password' in data:
+            del data['migrate_password']
+        
+        # Walidacja wymaganych pól
+        required_fields = ['name', 'surname', 'pesel']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return JSONResponse(
+                    status_code=400,
+                    content={"success": False, "error": f"Brakuje pola: {field}"}
+                )
+        
+        logging.info(f"🔄 FINAL MIGRATE: {data.get('name')} {data.get('surname')} (PESEL: {data.get('pesel')})")
+        
+        # Wywołaj funkcję save_patient
+        from database import save_patient
+        db_response = save_patient(data)
+        
+        if db_response.get('success', False):
+            logging.info(f"✅ FINAL MIGRATE: Pacjent {data.get('name')} {data.get('surname')} zmigrowany!")
+            return JSONResponse(content={"success": True, "message": "Pacjent zmigrowany pomyślnie"})
+        else:
+            error_msg = db_response.get('error', 'Błąd bazy danych')
+            logging.error(f"❌ FINAL MIGRATE: Błąd {data.get('name')} {data.get('surname')}: {error_msg}")
+            return JSONResponse(
+                status_code=500,
+                content={"success": False, "error": error_msg}
+            )
+    
+    except Exception as e:
+        error_message = f"Błąd podczas migracji: {str(e)}"
+        logging.error(f"❌ FINAL MIGRATE: {error_message}")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
 # Tymczasowy endpoint migracji został usunięty po zakończeniu migracji (2025-08-03) 
 @app.get("/api/calendar-events", name="calendar_events")
 async def calendar_events(start: Optional[str] = None, end: Optional[str] = None):
