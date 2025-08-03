@@ -1628,8 +1628,13 @@ def get_or_create_google_user(google_id, email, first_name, last_name, picture=N
 
 # API routes
 @app.get("/", name="home")
-async def home(request: Request, user = Depends(require_auth)):
-    return templates.TemplateResponse("index.html", {"request": request, "user": user})
+async def home(request: Request):
+    try:
+        user = require_auth(request)
+        return templates.TemplateResponse("index.html", {"request": request, "user": user})
+    except HTTPException:
+        # If not authenticated, redirect to login
+        return RedirectResponse("/login", status_code=302)
 
 
 @app.get("/new-documentation", name="new_documentation")
