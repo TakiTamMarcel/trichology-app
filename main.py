@@ -1931,72 +1931,7 @@ async def save_patient_api(request: Request, user = Depends(require_auth)):
             content={"success": False, "error": str(e)}
         )
 
-# TYMCZASOWY ENDPOINT DO IMPORTU PACJENTÓW - USUŃ PO MIGRACJI!
-@app.post("/api/import-patient", name="import_patient_api")
-async def import_patient_api(request: Request):
-    """
-    UWAGA: To jest tymczasowy endpoint do migracji danych!
-    Usuń ten endpoint po zakończeniu migracji dla bezpieczeństwa!
-    """
-    try:
-        # Pobierz dane JSON
-        data = await request.json()
-        
-        # Sprawdź hasło importu
-        import_password = data.get('import_password', '')
-        if import_password != 'MIGRATION_2025_TEMP':
-            return JSONResponse(
-                status_code=403,
-                content={"success": False, "error": "Nieprawidłowe hasło importu"}
-            )
-        
-        # Usuń hasło z danych pacjenta
-        if 'import_password' in data:
-            del data['import_password']
-        
-        # Sprawdź wymagane pola
-        required_fields = ['name', 'surname', 'pesel']
-        for field in required_fields:
-            if field not in data or not data[field]:
-                return JSONResponse(
-                    status_code=400,
-                    content={"success": False, "error": f"Brakuje wymaganego pola: {field}"}
-                )
-        
-        logging.info(f"🔄 IMPORT: Migracja pacjenta {data.get('name')} {data.get('surname')} (PESEL: {data.get('pesel')})")
-        
-        # Wywołaj istniejącą funkcję save_patient
-        from database import save_patient
-        db_response = save_patient(data)
-        
-        # Zwróć odpowiedź
-        if db_response.get('success', False):
-            logging.info(f"✅ IMPORT: Pacjent {data.get('name')} {data.get('surname')} został zaimportowany pomyślnie")
-            return JSONResponse(content={"success": True, "message": "Pacjent został zaimportowany pomyślnie"})
-        else:
-            error_msg = db_response.get('error', 'Nieznany błąd bazy danych')
-            logging.error(f"❌ IMPORT: Błąd migracji pacjenta {data.get('name')} {data.get('surname')}: {error_msg}")
-            return JSONResponse(
-                status_code=500,
-                content={"success": False, "error": error_msg}
-            )
-    
-    except json.JSONDecodeError as e:
-        error_message = f"Invalid JSON format: {str(e)}"
-        logging.error(f"❌ IMPORT: JSON decode error: {error_message}")
-        return JSONResponse(
-            status_code=400,
-            content={"success": False, "error": error_message}
-        )
-    
-    except Exception as e:
-        error_message = f"Unexpected error during import: {str(e)}"
-        logging.error(f"❌ IMPORT: Unexpected error: {error_message}")
-        return JSONResponse(
-            status_code=500,
-            content={"success": False, "error": str(e)}
-        )
-
+# Tymczasowy endpoint importu został usunięty po zakończeniu migracji (2025-01-03)
 @app.get("/api/calendar-events", name="calendar_events")
 async def calendar_events(start: Optional[str] = None, end: Optional[str] = None):
     try:
