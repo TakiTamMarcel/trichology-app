@@ -22,6 +22,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from google_auth_oauthlib.flow import Flow
 import secrets
+from cloudinary_utils import upload_file_to_cloudinary, init_cloudinary, get_optimized_url
 
 # Development mode - disable authentication for local development
 DEV_MODE = os.environ.get('DEV_MODE', 'true').lower() == 'true'
@@ -2704,30 +2705,37 @@ async def save_trichoscopy_photo_api(pesel: str,
                 content={"success": False, "error": f"Błąd podczas odczytu pliku: {str(e)}"}
             )
         
-        # Utwórz katalog dla zdjęć trychoskopii, jeśli nie istnieje
-        trichoscopy_dir = os.path.join("static", "uploads", "trichoscopy", pesel)
-        os.makedirs(trichoscopy_dir, exist_ok=True)
-        
         # Generuj unikalną nazwę pliku
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         filename = f"{timestamp}_trichoscopy.jpg"
-        file_path = os.path.join(trichoscopy_dir, filename)
         
-        # Zapisz plik na dysku
+        # Upload na Cloudinary
         try:
-            with open(file_path, "wb") as buffer:
-                buffer.write(contents)
-            print(f"Plik zapisany w: {file_path}")
+            cloudinary_result = upload_file_to_cloudinary(
+                file_content=contents,
+                filename=filename,
+                folder="trichoscopy",
+                patient_pesel=pesel
+            )
+            
+            if not cloudinary_result['success']:
+                conn.close()
+                print(f"Błąd podczas uploadu na Cloudinary: {cloudinary_result.get('error')}")
+                return JSONResponse(
+                    status_code=500,
+                    content={"success": False, "error": f"Błąd podczas uploadu: {cloudinary_result.get('error')}"}
+                )
+            
+            photo_url = cloudinary_result['url']
+            print(f"Plik przesłany na Cloudinary: {photo_url}")
+            
         except Exception as e:
             conn.close()
-            print(f"Błąd podczas zapisywania pliku: {str(e)}")
+            print(f"Błąd podczas uploadu na Cloudinary: {str(e)}")
             return JSONResponse(
                 status_code=500,
-                content={"success": False, "error": f"Błąd podczas zapisywania pliku: {str(e)}"}
+                content={"success": False, "error": f"Błąd podczas uploadu: {str(e)}"}
             )
-        
-        # Przygotuj URL do zdjęcia
-        photo_url = f"/static/uploads/trichoscopy/{pesel}/{filename}"
         
         # Zapisz dane do bazy
         try:
@@ -2742,11 +2750,7 @@ async def save_trichoscopy_photo_api(pesel: str,
         except Exception as e:
             conn.rollback()
             print(f"Błąd podczas zapisywania do bazy: {str(e)}")
-            # Usuń zapisany plik jeśli nie udało się zapisać do bazy
-            try:
-                os.remove(file_path)
-            except:
-                pass
+            # Plik już jest na Cloudinary, więc nie usuwamy go lokalnie
             return JSONResponse(
                 status_code=500,
                 content={"success": False, "error": f"Błąd podczas zapisywania do bazy: {str(e)}"}
@@ -2820,30 +2824,37 @@ async def save_clinical_photo_api(pesel: str,
                 content={"success": False, "error": f"Błąd podczas odczytu pliku: {str(e)}"}
             )
         
-        # Utwórz katalog dla obrazów klinicznych, jeśli nie istnieje
-        clinical_dir = os.path.join("static", "uploads", "clinical", pesel)
-        os.makedirs(clinical_dir, exist_ok=True)
-        
         # Generuj unikalną nazwę pliku
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         filename = f"{timestamp}_clinical.jpg"
-        file_path = os.path.join(clinical_dir, filename)
         
-        # Zapisz plik na dysku
+        # Upload na Cloudinary
         try:
-            with open(file_path, "wb") as buffer:
-                buffer.write(contents)
-            print(f"Plik zapisany w: {file_path}")
+            cloudinary_result = upload_file_to_cloudinary(
+                file_content=contents,
+                filename=filename,
+                folder="clinical",
+                patient_pesel=pesel
+            )
+            
+            if not cloudinary_result['success']:
+                conn.close()
+                print(f"Błąd podczas uploadu na Cloudinary: {cloudinary_result.get('error')}")
+                return JSONResponse(
+                    status_code=500,
+                    content={"success": False, "error": f"Błąd podczas uploadu: {cloudinary_result.get('error')}"}
+                )
+            
+            photo_url = cloudinary_result['url']
+            print(f"Plik przesłany na Cloudinary: {photo_url}")
+            
         except Exception as e:
             conn.close()
-            print(f"Błąd podczas zapisywania pliku: {str(e)}")
+            print(f"Błąd podczas uploadu na Cloudinary: {str(e)}")
             return JSONResponse(
                 status_code=500,
-                content={"success": False, "error": f"Błąd podczas zapisywania pliku: {str(e)}"}
+                content={"success": False, "error": f"Błąd podczas uploadu: {str(e)}"}
             )
-        
-        # Przygotuj URL do zdjęcia
-        photo_url = f"/static/uploads/clinical/{pesel}/{filename}"
         
         # Zapisz dane do bazy
         try:
@@ -2858,11 +2869,7 @@ async def save_clinical_photo_api(pesel: str,
         except Exception as e:
             conn.rollback()
             print(f"Błąd podczas zapisywania do bazy: {str(e)}")
-            # Usuń zapisany plik jeśli nie udało się zapisać do bazy
-            try:
-                os.remove(file_path)
-            except:
-                pass
+            # Plik już jest na Cloudinary, więc nie usuwamy go lokalnie
             return JSONResponse(
                 status_code=500,
                 content={"success": False, "error": f"Błąd podczas zapisywania do bazy: {str(e)}"}

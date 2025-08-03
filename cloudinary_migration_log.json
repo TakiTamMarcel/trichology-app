@@ -1,0 +1,538 @@
+[
+  {
+    "success": true,
+    "local_path": "static/uploads/visits/1/20250706130721_plynna-glinka-do-wlosow-silmilk-volume-cream-silkclay.webp",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241075/trichology/visits/1/trichology/visits/1/20250803_191114_20250706130721_plynna-glinka-do-wlosow-silmilk-volume-cream-silkclay.webp",
+    "public_id": "trichology/visits/1/trichology/visits/1/20250803_191114_20250706130721_plynna-glinka-do-wlosow-silmilk-volume-cream-silkclay",
+    "type": "visits",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/visits/12345678901/20250704204123_plynna-glinka-do-wlosow-silmilk-volume-cream-silkclay.webp",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241075/trichology/visits/12345678901/trichology/visits/12345678901/20250803_191115_20250704204123_plynna-glinka-do-wlosow-silmilk-volume-cream-silkclay.webp",
+    "public_id": "trichology/visits/12345678901/trichology/visits/12345678901/20250803_191115_20250704204123_plynna-glinka-do-wlosow-silmilk-volume-cream-silkclay",
+    "type": "visits",
+    "patient_pesel": "12345678901"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/91101700894/20250713190112_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241077/trichology/trichoscopy/91101700894/trichology/trichoscopy/91101700894/20250803_191116_20250713190112_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/91101700894/trichology/trichoscopy/91101700894/20250803_191116_20250713190112_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "91101700894"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/91101700894/20250713190333_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241078/trichology/trichoscopy/91101700894/trichology/trichoscopy/91101700894/20250803_191117_20250713190333_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/91101700894/trichology/trichoscopy/91101700894/20250803_191117_20250713190333_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "91101700894"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/324234/20250705180949_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241079/trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191118_20250705180949_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191118_20250705180949_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "324234"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/324234/20250705181019_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241079/trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191119_20250705181019_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191119_20250705181019_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "324234"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/324234/20250706100954_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241080/trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191119_20250706100954_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191119_20250706100954_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "324234"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/324234/20250705181013_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241081/trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191120_20250705181013_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191120_20250705181013_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "324234"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/324234/20250713161503_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241081/trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191121_20250713161503_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191121_20250713161503_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "324234"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/324234/20250705175500_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241083/trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191122_20250705175500_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191122_20250705175500_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "324234"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/324234/20250705175937_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241083/trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191123_20250705175937_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191123_20250705175937_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "324234"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/324234/20250705175943_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241084/trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191123_20250705175943_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/324234/trichology/trichoscopy/324234/20250803_191123_20250705175943_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "324234"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/asdasd/20250706145642_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241085/trichology/trichoscopy/asdasd/trichology/trichoscopy/asdasd/20250803_191124_20250706145642_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/asdasd/trichology/trichoscopy/asdasd/20250803_191124_20250706145642_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "asdasd"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/asdasd/20250706145636_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241086/trichology/trichoscopy/asdasd/trichology/trichoscopy/asdasd/20250803_191125_20250706145636_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/asdasd/trichology/trichoscopy/asdasd/20250803_191125_20250706145636_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "asdasd"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706184745_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241086/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191126_20250706184745_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191126_20250706184745_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706105056_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241087/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191127_20250706105056_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191127_20250706105056_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250325170504_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241088/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191127_20250325170504_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191127_20250325170504_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706164715_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241089/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191128_20250706164715_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191128_20250706164715_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706164728_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241089/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191129_20250706164728_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191129_20250706164728_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706121806_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241090/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191129_20250706121806_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191129_20250706121806_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706185324_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241091/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191130_20250706185324_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191130_20250706185324_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250325170713_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241091/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191131_20250325170713_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191131_20250325170713_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706202346_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241092/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191132_20250706202346_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191132_20250706202346_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706221722_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241093/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191132_20250706221722_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191132_20250706221722_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706104626_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241094/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191133_20250706104626_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191133_20250706104626_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706181417_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241094/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191134_20250706181417_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191134_20250706181417_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250325170500_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241095/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191135_20250325170500_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191135_20250325170500_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706211212_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241096/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191135_20250706211212_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191135_20250706211212_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706110044_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241096/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191136_20250706110044_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191136_20250706110044_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250325170716_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241097/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191137_20250325170716_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191137_20250325170716_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706121804_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241098/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191137_20250706121804_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191137_20250706121804_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/1/20250706110115_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241098/trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191138_20250706110115_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/1/trichology/trichoscopy/1/20250803_191138_20250706110115_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/91121700292/20250714203929_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241099/trichology/trichoscopy/91121700292/trichology/trichoscopy/91121700292/20250803_191138_20250714203929_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/91121700292/trichology/trichoscopy/91121700292/20250803_191138_20250714203929_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "91121700292"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/91121700292/20250714203938_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241100/trichology/trichoscopy/91121700292/trichology/trichoscopy/91121700292/20250803_191139_20250714203938_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/91121700292/trichology/trichoscopy/91121700292/20250803_191139_20250714203938_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "91121700292"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/91121700292/20250714204004_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241101/trichology/trichoscopy/91121700292/trichology/trichoscopy/91121700292/20250803_191140_20250714204004_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/91121700292/trichology/trichoscopy/91121700292/20250803_191140_20250714204004_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "91121700292"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/98042404056/20250714190911_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241101/trichology/trichoscopy/98042404056/trichology/trichoscopy/98042404056/20250803_191141_20250714190911_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/98042404056/trichology/trichoscopy/98042404056/20250803_191141_20250714190911_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "98042404056"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/98042404056/20250714190801_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241102/trichology/trichoscopy/98042404056/trichology/trichoscopy/98042404056/20250803_191142_20250714190801_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/98042404056/trichology/trichoscopy/98042404056/20250803_191142_20250714190801_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "98042404056"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/98042404056/20250714190822_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241103/trichology/trichoscopy/98042404056/trichology/trichoscopy/98042404056/20250803_191142_20250714190822_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/98042404056/trichology/trichoscopy/98042404056/20250803_191142_20250714190822_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "98042404056"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/98042404056/20250714190809_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241104/trichology/trichoscopy/98042404056/trichology/trichoscopy/98042404056/20250803_191143_20250714190809_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/98042404056/trichology/trichoscopy/98042404056/20250803_191143_20250714190809_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "98042404056"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/83062611126/20250713181116_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241104/trichology/trichoscopy/83062611126/trichology/trichoscopy/83062611126/20250803_191144_20250713181116_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/83062611126/trichology/trichoscopy/83062611126/20250803_191144_20250713181116_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "83062611126"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/83062611126/20250727191304_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241105/trichology/trichoscopy/83062611126/trichology/trichoscopy/83062611126/20250803_191145_20250727191304_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/83062611126/trichology/trichoscopy/83062611126/20250803_191145_20250727191304_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "83062611126"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/as/20250705175415_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241106/trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191145_20250705175415_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191145_20250705175415_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "as"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/as/20250705174831_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241106/trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191146_20250705174831_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191146_20250705174831_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "as"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/as/20250705175429_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241107/trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191147_20250705175429_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191147_20250705175429_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "as"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/as/20250705174545_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241108/trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191147_20250705174545_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191147_20250705174545_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "as"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/as/20250705174526_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241109/trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191148_20250705174526_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191148_20250705174526_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "as"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/as/20250705174554_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241109/trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191149_20250705174554_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191149_20250705174554_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "as"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/as/20250705174528_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241110/trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191150_20250705174528_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/as/trichology/trichoscopy/as/20250803_191150_20250705174528_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "as"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/asaSas/20250706101530_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241111/trichology/trichoscopy/asaSas/trichology/trichoscopy/asaSas/20250803_191150_20250706101530_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/asaSas/trichology/trichoscopy/asaSas/20250803_191150_20250706101530_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "asaSas"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/asaSas/20250706102601_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241111/trichology/trichoscopy/asaSas/trichology/trichoscopy/asaSas/20250803_191151_20250706102601_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/asaSas/trichology/trichoscopy/asaSas/20250803_191151_20250706102601_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "asaSas"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/asdasdasd/20250706102703_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241112/trichology/trichoscopy/asdasdasd/trichology/trichoscopy/asdasdasd/20250803_191152_20250706102703_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/asdasdasd/trichology/trichoscopy/asdasdasd/20250803_191152_20250706102703_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "asdasdasd"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/asdasdasd/20250706103325_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241113/trichology/trichoscopy/asdasdasd/trichology/trichoscopy/asdasdasd/20250803_191152_20250706103325_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/asdasdasd/trichology/trichoscopy/asdasdasd/20250803_191152_20250706103325_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "asdasdasd"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/asdasdasd/20250706103749_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241113/trichology/trichoscopy/asdasdasd/trichology/trichoscopy/asdasdasd/20250803_191153_20250706103749_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/asdasdasd/trichology/trichoscopy/asdasdasd/20250803_191153_20250706103749_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "asdasdasd"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/asdasdasd/20250706102720_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241114/trichology/trichoscopy/asdasdasd/trichology/trichoscopy/asdasdasd/20250803_191154_20250706102720_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/asdasdasd/trichology/trichoscopy/asdasdasd/20250803_191154_20250706102720_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "asdasdasd"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/asdasdasd/20250706102734_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241115/trichology/trichoscopy/asdasdasd/trichology/trichoscopy/asdasdasd/20250803_191155_20250706102734_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/asdasdasd/trichology/trichoscopy/asdasdasd/20250803_191155_20250706102734_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "asdasdasd"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/12345678901/20250706201558_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241116/trichology/trichoscopy/12345678901/trichology/trichoscopy/12345678901/20250803_191156_20250706201558_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/12345678901/trichology/trichoscopy/12345678901/20250803_191156_20250706201558_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "12345678901"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/12345678901/20250706201605_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241117/trichology/trichoscopy/12345678901/trichology/trichoscopy/12345678901/20250803_191157_20250706201605_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/12345678901/trichology/trichoscopy/12345678901/20250803_191157_20250706201605_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "12345678901"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/92060207477/20250730203027_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241118/trichology/trichoscopy/92060207477/trichology/trichoscopy/92060207477/20250803_191158_20250730203027_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/92060207477/trichology/trichoscopy/92060207477/20250803_191158_20250730203027_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "92060207477"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/92060207477/20250730203012_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241119/trichology/trichoscopy/92060207477/trichology/trichoscopy/92060207477/20250803_191158_20250730203012_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/92060207477/trichology/trichoscopy/92060207477/20250803_191158_20250730203012_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "92060207477"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/92060207477/20250730203019_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241120/trichology/trichoscopy/92060207477/trichology/trichoscopy/92060207477/20250803_191159_20250730203019_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/92060207477/trichology/trichoscopy/92060207477/20250803_191159_20250730203019_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "92060207477"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/92060207477/20250730203032_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241121/trichology/trichoscopy/92060207477/trichology/trichoscopy/92060207477/20250803_191200_20250730203032_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/92060207477/trichology/trichoscopy/92060207477/20250803_191200_20250730203032_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "92060207477"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/93040115810/20250713162827_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241121/trichology/trichoscopy/93040115810/trichology/trichoscopy/93040115810/20250803_191201_20250713162827_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/93040115810/trichology/trichoscopy/93040115810/20250803_191201_20250713162827_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "93040115810"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/93040115810/20250730132659_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241122/trichology/trichoscopy/93040115810/trichology/trichoscopy/93040115810/20250803_191202_20250730132659_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/93040115810/trichology/trichoscopy/93040115810/20250803_191202_20250730132659_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "93040115810"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/trichoscopy/93040115810/20250713162840_trichoscopy.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241123/trichology/trichoscopy/93040115810/trichology/trichoscopy/93040115810/20250803_191202_20250713162840_trichoscopy.jpg",
+    "public_id": "trichology/trichoscopy/93040115810/trichology/trichoscopy/93040115810/20250803_191202_20250713162840_trichoscopy",
+    "type": "trichoscopy",
+    "patient_pesel": "93040115810"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/clinical/1/20250707094719_clinical.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241124/trichology/clinical/1/trichology/clinical/1/20250803_191203_20250707094719_clinical.webp",
+    "public_id": "trichology/clinical/1/trichology/clinical/1/20250803_191203_20250707094719_clinical",
+    "type": "clinical",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/clinical/1/20250707094650_clinical.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241125/trichology/clinical/1/trichology/clinical/1/20250803_191204_20250707094650_clinical.png",
+    "public_id": "trichology/clinical/1/trichology/clinical/1/20250803_191204_20250707094650_clinical",
+    "type": "clinical",
+    "patient_pesel": "1"
+  },
+  {
+    "success": true,
+    "local_path": "static/uploads/clinical/1/20250707112628_clinical.jpg",
+    "cloudinary_url": "https://res.cloudinary.com/degzs8qch/image/upload/v1754241126/trichology/clinical/1/trichology/clinical/1/20250803_191205_20250707112628_clinical.webp",
+    "public_id": "trichology/clinical/1/trichology/clinical/1/20250803_191205_20250707112628_clinical",
+    "type": "clinical",
+    "patient_pesel": "1"
+  }
+]
