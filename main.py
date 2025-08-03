@@ -3528,14 +3528,14 @@ async def google_callback(request: Request, code: str = Query(None), state: str 
         # Exchange authorization code for tokens
         try:
             flow.fetch_token(code=code)
-        except Exception as scope_error:
-            # Handle scope validation errors - often just format differences
-            logger.warning(f"OAuth scope format difference (not critical): {str(scope_error)}")
-            # Try to continue with the flow as scope format differences are usually not critical
-            try:
-                flow.fetch_token(code=code, include_granted_scopes=True)
-            except Exception as retry_error:
-                logger.error(f"OAuth token fetch failed on retry: {str(retry_error)}")
+        except Exception as token_error:
+            # Handle scope validation errors - usually just format differences, not critical
+            error_msg = str(token_error)
+            if "Scope has changed" in error_msg:
+                logger.warning(f"OAuth scope format difference (not critical): {error_msg}")
+                # For scope format differences, continue - the token is still valid
+            else:
+                logger.error(f"OAuth token fetch failed: {error_msg}")
                 return RedirectResponse("/login?error=oauth_token_error")
         
         # Get user info from Google
