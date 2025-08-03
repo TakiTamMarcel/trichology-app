@@ -1,5 +1,6 @@
 import sqlite3
 import json
+import os
 from datetime import datetime
 
 def get_db_connection():
@@ -322,15 +323,22 @@ def init_db():
         # Create default admin user if no users exist
         cursor.execute('SELECT COUNT(*) FROM users')
         if cursor.fetchone()[0] == 0:
+            # Get admin email from environment variable, fallback to default
+            admin_email = os.environ.get('ADMIN_EMAIL', 'admin@yourdomain.com')
             current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
             cursor.execute('''
                 INSERT INTO users (email, password_hash, first_name, last_name, role, invitation_status, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', ('admin@yourdomain.com', '', 'Admin', 'Administrator', 'admin', 'accepted', current_time, current_time))
+            ''', (admin_email, '', 'Admin', 'Administrator', 'admin', 'accepted', current_time, current_time))
             
-            print("📧 Created default admin user: admin@yourdomain.com")
-            print("⚠️  IMPORTANT: Change this email to your Google account email in Railway environment variables!")
-            print("🔧 Set ADMIN_EMAIL=your-google-email@gmail.com in Railway Variables")
+            if admin_email == 'admin@yourdomain.com':
+                print("📧 Created default admin user: admin@yourdomain.com")
+                print("⚠️  IMPORTANT: Change this email to your Google account email in Railway environment variables!")
+                print("🔧 Set ADMIN_EMAIL=your-google-email@gmail.com in Railway Variables")
+            else:
+                print(f"✅ Created admin user: {admin_email}")
+                print("🔒 Production admin user configured successfully!")
         
         conn.commit()
         conn.close()
