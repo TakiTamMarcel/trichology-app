@@ -3531,7 +3531,11 @@ async def google_callback(request: Request, code: str = Query(None), state: str 
             return RedirectResponse("/login?error=oauth_error")
         
         # Exchange authorization code for tokens
-        flow.fetch_token(code=code)
+        try:
+            flow.fetch_token(code=code)
+        except Exception as fetch_error:
+            logger.error(f"Failed to fetch OAuth token: {str(fetch_error)}")
+            return RedirectResponse("/login?error=oauth_token_error")
         
         # Get user info from Google
         credentials = flow.credentials
