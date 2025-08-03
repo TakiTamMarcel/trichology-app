@@ -1937,73 +1937,7 @@ async def save_patient_api(request: Request, user = Depends(require_auth)):
             content={"success": False, "error": str(e)}
         )
 
-# TYMCZASOWY ENDPOINT DO PONOWNEJ MIGRACJI - USUŃ PO ZAKOŃCZENIU!
-@app.post("/api/temp-migrate-patient", name="temp_migrate_patient")
-async def temp_migrate_patient(request: Request):
-    """
-    UWAGA: To jest tymczasowy endpoint do ponownej migracji danych!
-    Usuń ten endpoint po zakończeniu migracji dla bezpieczeństwa!
-    """
-    try:
-        # Pobierz dane JSON
-        data = await request.json()
-        
-        # Sprawdź hasło migracji
-        migrate_password = data.get('migrate_password', '')
-        if migrate_password != 'TEMP_MIGRATE_2025_AUG':
-            return JSONResponse(
-                status_code=403,
-                content={"success": False, "error": "Nieprawidłowe hasło migracji"}
-            )
-        
-        # Usuń hasło z danych pacjenta
-        if 'migrate_password' in data:
-            del data['migrate_password']
-        
-        # Sprawdź wymagane pola
-        required_fields = ['name', 'surname', 'pesel']
-        for field in required_fields:
-            if field not in data or not data[field]:
-                return JSONResponse(
-                    status_code=400,
-                    content={"success": False, "error": f"Brakuje wymaganego pola: {field}"}
-                )
-        
-        logging.info(f"🔄 TEMP MIGRATE: {data.get('name')} {data.get('surname')} (PESEL: {data.get('pesel')})")
-        
-        # Wywołaj istniejącą funkcję save_patient z database.py
-        from database import save_patient
-        db_response = save_patient(data)
-        
-        # Zwróć odpowiedź
-        if db_response.get('success', False):
-            logging.info(f"✅ TEMP MIGRATE: Pacjent {data.get('name')} {data.get('surname')} zmigrowany pomyślnie")
-            return JSONResponse(content={"success": True, "message": "Pacjent został zmigrowany pomyślnie"})
-        else:
-            error_msg = db_response.get('error', 'Nieznany błąd bazy danych')
-            logging.error(f"❌ TEMP MIGRATE: Błąd migracji {data.get('name')} {data.get('surname')}: {error_msg}")
-            return JSONResponse(
-                status_code=500,
-                content={"success": False, "error": error_msg}
-            )
-    
-    except json.JSONDecodeError as e:
-        error_message = f"Invalid JSON format: {str(e)}"
-        logging.error(f"❌ TEMP MIGRATE: JSON decode error: {error_message}")
-        return JSONResponse(
-            status_code=400,
-            content={"success": False, "error": error_message}
-        )
-    
-    except Exception as e:
-        error_message = f"Unexpected error during temp migration: {str(e)}"
-        logging.error(f"❌ TEMP MIGRATE: Unexpected error: {error_message}")
-        return JSONResponse(
-            status_code=500,
-            content={"success": False, "error": str(e)}
-        )
-
-# Tymczasowy endpoint importu został usunięty po zakończeniu migracji (2025-01-03) 
+# Tymczasowy endpoint migracji został usunięty po zakończeniu migracji (2025-08-03) 
 @app.get("/api/calendar-events", name="calendar_events")
 async def calendar_events(start: Optional[str] = None, end: Optional[str] = None):
     try:
