@@ -320,6 +320,119 @@ def init_db():
         except sqlite3.Error as e:
             print(f"Error updating user roles: {str(e)}")
         
+        # Create tables for photos
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS trichoscopy_photos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pesel TEXT NOT NULL,
+                photo_url TEXT NOT NULL,
+                note TEXT,
+                head_region TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (pesel) REFERENCES patients(pesel) ON DELETE CASCADE
+            )
+        ''')
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS clinical_photos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pesel TEXT NOT NULL,
+                photo_url TEXT NOT NULL,
+                note TEXT,
+                photo_type TEXT DEFAULT 'clinical',
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (pesel) REFERENCES patients(pesel) ON DELETE CASCADE
+            )
+        ''')
+        
+        # Create visits table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS visits (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pesel TEXT NOT NULL,
+                visit_date TEXT NOT NULL,
+                visit_type TEXT,
+                purpose TEXT,
+                diagnosis TEXT,
+                treatments TEXT,
+                recommendations TEXT,
+                notes TEXT,
+                cost REAL DEFAULT 0.0,
+                images TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (pesel) REFERENCES patients(pesel) ON DELETE CASCADE
+            )
+        ''')
+        
+        # Create external visits table for integrations
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS external_visits (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pesel TEXT NOT NULL,
+                visit_date TEXT NOT NULL,
+                source TEXT NOT NULL,
+                data TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (pesel) REFERENCES patients(pesel)
+            )
+        ''')
+        
+        # Create index for external visits
+        cursor.execute('''
+            CREATE INDEX IF NOT EXISTS idx_external_visits_pesel_date 
+            ON external_visits(pesel, visit_date)
+        ''')
+        print("Creating index for external visits")
+        
+        # Create home care plans table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS home_care_plans (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pesel TEXT NOT NULL,
+                product_type TEXT,
+                product_name TEXT,
+                dose TEXT,
+                frequency TEXT,
+                notes TEXT,
+                is_completed INTEGER DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (pesel) REFERENCES patients(pesel) ON DELETE CASCADE
+            )
+        ''')
+        
+        # Create clinic treatment plans table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS clinic_treatment_plans (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pesel TEXT NOT NULL,
+                treatment_type TEXT,
+                frequency TEXT,
+                notes TEXT,
+                is_completed INTEGER DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                FOREIGN KEY (pesel) REFERENCES patients(pesel) ON DELETE CASCADE
+            )
+        ''')
+        
+        # Create payments table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS payments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                patient_pesel TEXT NOT NULL,
+                amount REAL NOT NULL,
+                payment_type TEXT NOT NULL,
+                description TEXT,
+                reference_id INTEGER,
+                reference_type TEXT,
+                payment_method TEXT DEFAULT 'cash',
+                notes TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (patient_pesel) REFERENCES patients(pesel)
+            )
+        ''')
+
         # Create default admin user if no users exist
         cursor.execute('SELECT COUNT(*) FROM users')
         if cursor.fetchone()[0] == 0:
