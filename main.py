@@ -1937,34 +1937,45 @@ async def save_patient_api(request: Request, user = Depends(require_auth)):
             content={"success": False, "error": str(e)}
         )
 
-# SZYBKA PONOWNA MIGRACJA PO KOLEJNYM RESECIE RAILWAY!
-@app.post("/api/speed-migrate-patient", name="speed_migrate_patient")
-async def speed_migrate_patient(request: Request):
-    """SZYBKA migracja po kolejnym resecie Railway - usuń natychmiast!"""
+# TYMCZASOWY ENDPOINT DO AKTUALIZACJI ŚCIEŻEK PLIKÓW
+@app.post("/api/update-file-path", name="update_file_path")
+async def update_file_path(request: Request):
+    """Aktualizuje ścieżki plików w bazie Railway na Cloudinary URLs"""
     try:
         data = await request.json()
         
-        # Hasło migracji
-        if data.get('migrate_password', '') != 'SPEED_MIGRATE_AUG_03':
+        # Hasło
+        if data.get('migrate_password', '') != 'UPDATE_PATHS_AUG_03':
             return JSONResponse(status_code=403, content={"success": False, "error": "Wrong password"})
         
-        # Usuń hasło
-        if 'migrate_password' in data:
-            del data['migrate_password']
+        old_path = data.get('old_path')
+        new_path = data.get('new_path')
         
-        # Walidacja
-        for field in ['name', 'surname', 'pesel']:
-            if field not in data or not data[field]:
-                return JSONResponse(status_code=400, content={"success": False, "error": f"Missing: {field}"})
+        if not old_path or not new_path:
+            return JSONResponse(status_code=400, content={"success": False, "error": "Missing paths"})
         
-        # Migruj
-        from database import save_patient
-        db_response = save_patient(data)
+        # Aktualizuj w bazach
+        conn = sqlite3.connect('trichology.db')
+        cursor = conn.cursor()
         
-        if db_response.get('success', False):
-            return JSONResponse(content={"success": True, "message": "Patient migrated"})
-        else:
-            return JSONResponse(status_code=500, content={"success": False, "error": db_response.get('error', 'DB error')})
+        updated = 0
+        
+        # Trichoscopy photos
+        cursor.execute("UPDATE trichoscopy_photos SET photo_path = ? WHERE photo_path = ?", (new_path, old_path))
+        updated += cursor.rowcount
+        
+        # Clinical photos  
+        cursor.execute("UPDATE clinical_photos SET photo_path = ? WHERE photo_path = ?", (new_path, old_path))
+        updated += cursor.rowcount
+        
+        # Documents
+        cursor.execute("UPDATE patient_documents SET document_path = ? WHERE document_path = ?", (new_path, old_path))
+        updated += cursor.rowcount
+        
+        conn.commit()
+        conn.close()
+        
+        return JSONResponse(content={"success": True, "updated": updated})
     
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
