@@ -4608,6 +4608,38 @@ async def export_calendar_ical():
         )
 
 
+@app.post("/api/emergency-fix-database")
+async def emergency_fix_database():
+    """
+    AWARYJNY endpoint - Railway zresetowało bazę ZNOWU!
+    Odtwarza wszystkie tabele po resecie Railway
+    """
+    try:
+        success = init_db()
+        
+        if success:
+            return JSONResponse(content={
+                "success": True,
+                "message": "🚨 BAZA NAPRAWIONA po resecie Railway!",
+                "tables_created": [
+                    "patients", "trichoscopy_photos", "clinical_photos", "visits", 
+                    "external_visits", "home_care_plans", "clinic_treatment_plans", 
+                    "payments", "tasks", "users", "sessions", "available_treatments"
+                ],
+                "next_step": "Zaimportuj pacjentów przez /api/import-patients"
+            })
+        else:
+            return JSONResponse(
+                status_code=500,
+                content={"success": False, "error": "Błąd inicjalizacji bazy"}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": f"Błąd: {str(e)}"}
+        )
+
 @app.get("/calendar.ics")
 async def calendar_feed():
     """

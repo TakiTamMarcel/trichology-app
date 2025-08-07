@@ -432,6 +432,22 @@ def init_db():
                 FOREIGN KEY (patient_pesel) REFERENCES patients(pesel)
             )
         ''')
+        
+        # Create tasks table for dashboard
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                description TEXT,
+                patient_pesel TEXT,
+                is_completed INTEGER DEFAULT 0,
+                priority TEXT DEFAULT 'medium',
+                due_date TEXT,
+                created_at TEXT NOT NULL,
+                completed_at TEXT,
+                FOREIGN KEY (patient_pesel) REFERENCES patients(pesel)
+            )
+        ''')
 
         # Create default admin user if no users exist
         cursor.execute('SELECT COUNT(*) FROM users')
