@@ -4284,6 +4284,57 @@ async def calendar_events_combined(start: Optional[str] = None, end: Optional[st
     """
     return await calendar_events(start, end)
 
+def save_patient_simple(data):
+    """
+    Prosta wersja zapisu pacjenta - tylko podstawowe pola, bez auto-dodawanych kolumn
+    Używana do importu danych z lokalnej bazy do produkcyjnej
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Tylko podstawowe pola, które na pewno są w każdej wersji bazy
+        basic_fields = {
+            'pesel': data.get('pesel', ''),
+            'name': data.get('name', ''),
+            'surname': data.get('surname', ''),
+            'birthdate': data.get('birthdate', ''),
+            'gender': data.get('gender', ''),
+            'phone': data.get('phone', ''),
+            'email': data.get('email', ''),
+            'height': data.get('height', ''),
+            'weight': data.get('weight', ''),
+            'medication_list': data.get('medication_list', '[]'),
+            'supplements_list': data.get('supplements_list', '[]'),
+            'allergens': data.get('allergens', '[]'),
+            'diseases': data.get('diseases', '[]'),
+            'treatments': data.get('treatments', '[]'),
+            'notes': data.get('notes', ''),
+            'created_at': data.get('created_at', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        }
+        
+        # Przygotuj zapytanie SQL
+        columns = ', '.join(basic_fields.keys())
+        placeholders = ', '.join(['?' for _ in basic_fields])
+        values = tuple(basic_fields.values())
+        
+        query = f"INSERT OR REPLACE INTO patients ({columns}) VALUES ({placeholders})"
+        
+        cursor.execute(query, values)
+        conn.commit()
+        conn.close()
+        
+        return {'success': True, 'message': 'Patient saved successfully'}
+        
+    except sqlite3.Error as e:
+        if 'conn' in locals() and conn:
+            conn.close()
+        return {'success': False, 'error': f'Database error: {str(e)}'}
+    except Exception as e:
+        if 'conn' in locals() and conn:
+            conn.close()
+        return {'success': False, 'error': f'Unexpected error: {str(e)}'}
+
 @app.post("/api/import-patients")
 async def import_patients_api(request: Request, file: UploadFile = File(...)):
     """
@@ -4321,8 +4372,8 @@ async def import_patients_api(request: Request, file: UploadFile = File(...)):
                     skipped_count += 1
                     continue
                 
-                # Zapisz pacjenta
-                result = save_patient(patient_data)
+                # Zapisz pacjenta z prostą wersją (bez dodatkowych pól)
+                result = save_patient_simple(patient_data)
                 if result.get('success', False):
                     imported_count += 1
                 else:
