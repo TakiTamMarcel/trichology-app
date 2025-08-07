@@ -360,6 +360,8 @@
                 const data = await response.json();
                 if (data.success) {
                     displayPatients(data.patients);
+                } else {
+                    console.error('API returned error:', data.error || 'Unknown error');
                 }
             } catch (error) {
                 console.error('Error loading patients:', error);

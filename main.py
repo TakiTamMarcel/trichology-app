@@ -2062,7 +2062,21 @@ async def patients_list(request: Request, user = Depends(require_auth)):
 @app.get("/api/search-patients", name="search_patients_api")
 async def search_patients_api(request: Request, query: str = ""):
     patients = search_patients(query)
-    return JSONResponse(content={"success": True, "patients": patients})
+    
+    # Mapuj nazwy pól dla zgodności z frontendem
+    mapped_patients = []
+    for patient in patients:
+        mapped_patient = {
+            'pesel': patient.get('pesel', ''),
+            'first_name': patient.get('first_name', patient.get('name', '')),  # Najpierw spróbuj first_name, potem name
+            'last_name': patient.get('last_name', patient.get('surname', '')),  # Najpierw spróbuj last_name, potem surname
+            'phone': patient.get('phone', ''),
+            'email': patient.get('email', ''),
+            'last_visit': patient.get('last_visit', None)
+        }
+        mapped_patients.append(mapped_patient)
+    
+    return JSONResponse(content={"success": True, "patients": mapped_patients})
 
 @app.post("/api/search-patients", name="search_patients_post_api")
 async def search_patients_post_api(request: Request):
@@ -2070,7 +2084,21 @@ async def search_patients_post_api(request: Request):
         data = await request.json()
         query = data.get("query", "")
         patients = search_patients(query)
-        return JSONResponse(content={"success": True, "patients": patients})
+        
+        # Mapuj nazwy pól dla zgodności z frontendem
+        mapped_patients = []
+        for patient in patients:
+            mapped_patient = {
+                'pesel': patient.get('pesel', ''),
+                'first_name': patient.get('first_name', patient.get('name', '')),  # Najpierw spróbuj first_name, potem name
+                'last_name': patient.get('last_name', patient.get('surname', '')),  # Najpierw spróbuj last_name, potem surname
+                'phone': patient.get('phone', ''),
+                'email': patient.get('email', ''),
+                'last_visit': patient.get('last_visit', None)
+            }
+            mapped_patients.append(mapped_patient)
+        
+        return JSONResponse(content={"success": True, "patients": mapped_patients})
     except Exception as e:
         return JSONResponse(
             status_code=500,
@@ -4255,6 +4283,172 @@ async def calendar_events_combined(start: Optional[str] = None, end: Optional[st
     Fallback do lokalnych wydarzeń (bez Google Calendar)
     """
     return await calendar_events(start, end)
+
+@app.post("/api/import-patients")
+async def import_patients_api(request: Request, file: UploadFile = File(...)):
+    """
+    Endpoint do importu pacjentów z pliku JSON.
+    Używany do przeniesienia danych z lokalnej bazy do produkcyjnej.
+    """
+    try:
+        # Sprawdź czy plik jest JSON
+        if not file.filename.endswith('.json'):
+            return JSONResponse(
+                status_code=400,
+                content={"success": False, "error": "Plik musi mieć rozszerzenie .json"}
+            )
+        
+        # Odczytaj zawartość pliku
+        content = await file.read()
+        patients_data = json.loads(content.decode('utf-8'))
+        
+        if not isinstance(patients_data, list):
+            return JSONResponse(
+                status_code=400,
+                content={"success": False, "error": "Plik JSON musi zawierać listę pacjentów"}
+            )
+        
+        # Importuj każdego pacjenta
+        imported_count = 0
+        skipped_count = 0
+        errors = []
+        
+        for patient_data in patients_data:
+            try:
+                # Sprawdź czy pacjent już istnieje
+                existing_patient = get_patient(patient_data.get('pesel', ''))
+                if existing_patient:
+                    skipped_count += 1
+                    continue
+                
+                # Zapisz pacjenta
+                result = save_patient(patient_data)
+                if result.get('success', False):
+                    imported_count += 1
+                else:
+                    errors.append(f"PESEL {patient_data.get('pesel', 'unknown')}: {result.get('error', 'Nieznany błąd')}")
+                    
+            except Exception as e:
+                errors.append(f"PESEL {patient_data.get('pesel', 'unknown')}: {str(e)}")
+        
+        return JSONResponse(content={
+            "success": True,
+            "message": f"Import zakończony",
+            "imported": imported_count,
+            "skipped": skipped_count,
+            "errors": errors[:10]  # Maksymalnie 10 błędów do wyświetlenia
+        })
+        
+    except json.JSONDecodeError as e:
+        return JSONResponse(
+            status_code=400,
+            content={"success": False, "error": f"Nieprawidłowy format JSON: {str(e)}"}
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": f"Błąd serwera: {str(e)}"}
+        )
+
+@app.get("/import-patients")
+async def import_patients_page(request: Request):
+    """Strona do importu pacjentów"""
+    return HTMLResponse(content=f"""
+    <!DOCTYPE html>
+    <html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Import Pacjentów - Trichology</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }}
+            .container {{ background: #f5f5f5; padding: 30px; border-radius: 10px; }}
+            .upload-area {{ border: 2px dashed #ccc; padding: 40px; text-align: center; margin: 20px 0; }}
+            .upload-area:hover {{ border-color: #007bff; }}
+            button {{ background: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; }}
+            button:hover {{ background: #0056b3; }}
+            .result {{ margin-top: 20px; padding: 15px; border-radius: 5px; }}
+            .success {{ background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }}
+            .error {{ background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🔄 Import Pacjentów</h1>
+            <p>Użyj tej strony do zaimportowania pacjentów z pliku JSON wyeksportowanego z lokalnej bazy danych.</p>
+            
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <p>📁 Kliknij tutaj lub przeciągnij plik JSON z pacjentami</p>
+                <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileSelect(event)">
+            </div>
+            
+            <button onclick="uploadFile()" id="uploadBtn" disabled>📤 Importuj Pacjentów</button>
+            
+            <div id="result"></div>
+        </div>
+
+        <script>
+            let selectedFile = null;
+            
+            function handleFileSelect(event) {{
+                selectedFile = event.target.files[0];
+                if (selectedFile) {{
+                    document.querySelector('.upload-area p').textContent = `Wybrano: ${{selectedFile.name}}`;
+                    document.getElementById('uploadBtn').disabled = false;
+                }}
+            }}
+            
+            async function uploadFile() {{
+                if (!selectedFile) return;
+                
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                
+                document.getElementById('uploadBtn').textContent = '⏳ Importowanie...';
+                document.getElementById('uploadBtn').disabled = true;
+                
+                try {{
+                    const response = await fetch('/api/import-patients', {{
+                        method: 'POST',
+                        body: formData
+                    }});
+                    
+                    const result = await response.json();
+                    const resultDiv = document.getElementById('result');
+                    
+                    if (result.success) {{
+                        resultDiv.innerHTML = `
+                            <div class="result success">
+                                <h3>✅ Import zakończony pomyślnie!</h3>
+                                <p>📊 Zaimportowano: <strong>${{result.imported}}</strong> pacjentów</p>
+                                <p>⏭️ Pominięto: <strong>${{result.skipped}}</strong> (już istniejący)</p>
+                                ${{result.errors.length > 0 ? `<p>⚠️ Błędy: ${{result.errors.length}}</p>` : ''}}
+                            </div>
+                        `;
+                    }} else {{
+                        resultDiv.innerHTML = `
+                            <div class="result error">
+                                <h3>❌ Błąd importu</h3>
+                                <p>${{result.error}}</p>
+                            </div>
+                        `;
+                    }}
+                }} catch (error) {{
+                    document.getElementById('result').innerHTML = `
+                        <div class="result error">
+                            <h3>❌ Błąd połączenia</h3>
+                            <p>${{error.message}}</p>
+                        </div>
+                    `;
+                }}
+                
+                document.getElementById('uploadBtn').textContent = '📤 Importuj Pacjentów';
+                document.getElementById('uploadBtn').disabled = false;
+            }}
+        </script>
+    </body>
+    </html>
+    """)
 
 @app.get("/api/export-ical")
 async def export_calendar_ical():
