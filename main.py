@@ -4607,36 +4607,6 @@ async def export_calendar_ical():
             content={"success": False, "error": str(e)}
         )
 
-@app.post("/api/fix-database-tables")
-async def fix_database_tables():
-    """
-    TYMCZASOWY endpoint do utworzenia brakujących tabel
-    Używaj TYLKO raz po deployment żeby naprawić bazę
-    """
-    try:
-        # Wymuś inicjalizację wszystkich tabel
-        success = init_db()
-        
-        if success:
-            return JSONResponse(content={
-                "success": True,
-                "message": "✅ Wszystkie tabele zostały utworzone/sprawdzone",
-                "tables_added": [
-                    "trichoscopy_photos", "clinical_photos", "visits", 
-                    "external_visits", "home_care_plans", "clinic_treatment_plans", "payments"
-                ]
-            })
-        else:
-            return JSONResponse(
-                status_code=500,
-                content={"success": False, "error": "Błąd podczas inicjalizacji bazy"}
-            )
-            
-    except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"success": False, "error": f"Błąd: {str(e)}"}
-        )
 
 @app.get("/calendar.ics")
 async def calendar_feed():
