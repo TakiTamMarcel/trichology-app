@@ -1,0 +1,1 @@
+[{"pesel": "TEST123", "name": "Test", "surname": "Patient", "phone": "123456789", "email": "test@example.com", "medication_list": "[]", "supplements_list": "[]", "allergens": "[]", "diseases": "[]", "treatments": "[]", "notes": "Test patient"}]
